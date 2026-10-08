@@ -70,3 +70,15 @@ test('API HTTP, JSON, schema and ID failures reject without fallback data', asyn
   await assert.rejects(getRecipe('1x')); await assert.rejects(getRecipe(null));
   await assert.rejects(getRecipe(1, { fetcher: async () => ({ ok: true, json: async () => ({ id: 2, name: 'Wrong' }) }) }));
 });
+
+test('missing ingredient selection preserves original indices and stored purchases', () => {
+  const r = recipe(7, 20, { ingredients: ['First', 'Second', 'Third'] });
+  assert.deepEqual(addRecipeItems([], r, []), []);
+  const missing = addRecipeItems([], r, [1, 2]);
+  assert.deepEqual(missing.map(x => [x.id, x.ingredientIndex, x.text]), [['recipe-7-1', 1, 'Second'], ['recipe-7-2', 2, 'Third']]);
+  missing[0].checked = true;
+  assert.equal(addRecipeItems(missing, r, [1, 2]).length, 2);
+  assert.equal(addRecipeItems(missing, r, [1, 2])[0].checked, true);
+  assert.equal(addRecipeItems(missing, r, [0]).length, 3);
+  assert.deepEqual(r.ingredients, ['First', 'Second', 'Third']);
+});

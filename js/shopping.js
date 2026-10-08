@@ -3,9 +3,10 @@ const key = 'paa-menuen:shopping:v1';
 const validItem = x => x && typeof x.id === 'string' && ['recipe', 'manual'].includes(x.source) && typeof x.text === 'string' && typeof x.checked === 'boolean' && (x.source === 'manual' || (Number.isInteger(x.recipeId) && typeof x.recipeName === 'string' && Number.isInteger(x.ingredientIndex)));
 export function getShoppingItems() { return readStore(key, [], v => Array.isArray(v) && v.every(validItem)); }
 export function saveShoppingItems(items) { return writeStore(key, items); }
-export function addRecipeItems(items, recipe) {
-  const next = [...items];
+export function addRecipeItems(items, recipe, ingredientIndices = recipe.ingredients.map((_, index) => index)) {
+  const next = [...items], selected = new Set(ingredientIndices);
   recipe.ingredients.forEach((text, index) => {
+    if (!selected.has(index)) return;
     const id = `recipe-${recipe.id}-${index}`;
     if (!next.some(item => item.id === id)) next.push({ id, source: 'recipe', recipeId: recipe.id, recipeName: recipe.name, ingredientIndex: index, text, checked: false });
   });
