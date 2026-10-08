@@ -74,6 +74,22 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     assert.deepEqual(await page.locator('.instruction-panel li').allTextContents(), first.instructions);
     assert.match(await page.locator('#recipe-detail').textContent(), /ikke ingrediensmængder/);
   });
+  await check('home ingredient marks add only missing original indices and no duplicates', async () => {
+    const isolated = await browser.newContext(), detail = await isolated.newPage();
+    await detail.goto(base+'singleproduct.html?id=1'); await detail.locator('#ingredient-0').waitFor();
+    const ingredients=data.find(r=>r.id===1).ingredients;
+    const add=detail.getByRole('button',{name:'Tilføj manglende ingredienser',exact:true});
+    await detail.locator('#ingredient-0').check(); await add.click(); await add.click();
+    let saved=await detail.evaluate(()=>JSON.parse(localStorage.getItem('paa-menuen:shopping:v1')));
+    assert.deepEqual(saved.map(x=>x.ingredientIndex),ingredients.map((_,i)=>i).slice(1));
+    assert.deepEqual(saved.map(x=>x.text),ingredients.slice(1));
+    for(const input of await detail.locator('.ingredient-row input').all()) await input.check();
+    assert.equal(await add.isDisabled(),true);
+    await detail.locator('#ingredient-0').uncheck(); await add.click();
+    saved=await detail.evaluate(()=>JSON.parse(localStorage.getItem('paa-menuen:shopping:v1')));
+    assert.equal(saved.length,ingredients.length);
+    assert.ok(saved.every(x=>x.id===`recipe-1-${x.ingredientIndex}`)); await isolated.close();
+  });
   await check('favorite add, reload, cross-page removal and empty state', async () => {
     await page.locator('.favorite-button').click(); await page.reload(); await page.locator('#recipe-detail h1').waitFor();
     assert.equal(await page.locator('.favorite-button').getAttribute('aria-pressed'), 'true');
@@ -87,7 +103,7 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
   });
   await check('shopping API ingredients, idempotence, purchased persistence, clear and manual creation', async () => {
     await visit('singleproduct.html?id=1', '#recipe-detail h1');
-    await page.getByRole('button', { name: 'Tilføj ingredienser til indkøbsliste' }).click(); await page.getByRole('button', { name: 'Tilføj ingredienser til indkøbsliste' }).click();
+    await page.getByRole('button', { name: 'Tilføj manglende ingredienser' }).click(); await page.getByRole('button', { name: 'Tilføj manglende ingredienser' }).click();
     await visit('indkoebsliste.html', '.shopping-row'); assert.equal(await page.locator('.shopping-row').count(), data.find(r => r.id === 1).ingredients.length);
     await page.locator('.shopping-row input').first().check(); await page.reload(); await page.locator('.shopping-row').first().waitFor(); assert.equal(await page.locator('.shopping-row input').first().isChecked(), true);
     await page.locator('#clear-purchased').click(); assert.equal(await page.locator('.shopping-row').count(), data.find(r => r.id === 1).ingredients.length - 1);
@@ -111,11 +127,15 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
   for (const query of ['', '?id=abc', '?id=-1', '?id=99999']) await check(`invalid detail ${query || 'missing ID'}`, async () => {
     await visit(`singleproduct.html${query}`, null); await page.waitForFunction(()=>document.querySelector('#status').dataset.state === 'error'); assert.equal(await page.locator('#recipe-detail h1').count(),0);
   });
-  await check('feedback form invalid email/required fields and honest valid feedback', async () => {
-    await visit('om-os.html', null); assert.equal(await page.locator('#contact-form').evaluate(f => f.checkValidity()),false);
-    await page.locator('#contact-name').fill('Test'); await page.locator('#contact-email').fill('bad'); await page.locator('#contact-message').fill('Test af formularen');
-    assert.equal(await page.locator('#contact-form').evaluate(f => f.checkValidity()),false);
-    await page.locator('#contact-email').fill('test@example.com'); await page.locator('#contact-form button').click(); assert.match(await page.locator('#form-status').textContent(), /ingen besked er sendt/);
+  await check('About has no feedback demo; shopping form validates and creates a persistent item', async () => {
+    await visit('om-os.html', null); assert.equal(await page.locator('#contact-form').count(),0);
+    assert.match(await page.locator('main').textContent(), /Team 8/);
+    assert.equal(await page.locator('footer').evaluate(e=>getComputedStyle(e).visibility),'visible');
+    await visit('indkoebsliste.html', null); assert.equal(await page.locator('footer').evaluate(e=>getComputedStyle(e).visibility),'visible'); const before=await page.locator('.shopping-row').count();
+    await page.locator('#manual-item').fill(''); assert.equal(await page.locator('#manual-form').evaluate(f=>f.checkValidity()),false);
+    await page.locator('#manual-item').fill('Linser'); assert.equal(await page.locator('#manual-form').evaluate(f=>f.checkValidity()),true);
+    await page.locator('#manual-form button').click(); assert.equal(await page.locator('.shopping-row').count(),before+1);
+    await page.reload(); await page.locator('.shopping-row').first().waitFor(); assert.equal(await page.locator('.shopping-row').count(),before+1);
   });
   await check('live normal-flow console errors', async () => { assert.deepEqual(consoleErrors, []); });
   const faultPage = await context.newPage();
@@ -161,6 +181,21 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     assert.equal(bounds.overflow,false); assert.ok(bounds.left>=bounds.dialogLeft && bounds.right<=bounds.dialogRight);
     await page.screenshot({path:path.join(output,`filter-label-${width}.png`)});
     await page.keyboard.press('Escape'); assert.equal(await page.locator('#filter-open').evaluate(el=>el===document.activeElement),true);
+  });
+  await check('short empty favorites fill viewport without extra scrolling',async()=>{
+    await page.setViewportSize({width:390,height:844}); await visit('favoritter.html',null);
+    await page.waitForFunction(()=>document.querySelector('#status').dataset.state==='empty');
+    await page.evaluate(()=>document.fonts.ready);
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1));
+  });
+  await check('all live recipe cards keep full titles and aligned favorite buttons',async()=>{
+    await visit('productlist.html'); while(await page.locator('#load-more').isVisible()) await page.locator('#load-more').click();
+    const titles=await page.locator('.card-title').allTextContents(); assert.equal(titles.length,data.length);
+    assert.deepEqual([...titles].sort(),data.map(r=>r.name).sort());
+    assert.ok(await page.locator('.recipe-card').evaluateAll(cards=>{
+      const rows=new Map(); cards.forEach(c=>{const top=Math.round(c.getBoundingClientRect().top),values=rows.get(top)||[];values.push(c.querySelector('.favorite-button').getBoundingClientRect().bottom);rows.set(top,values)});
+      return [...rows.values()].every(values=>Math.max(...values)-Math.min(...values)<1);
+    }));
   });
   const metrics = await page.evaluate(()=>({resources:performance.getEntriesByType('resource').map(x=>({url:x.name,duration:x.duration,transferSize:x.transferSize,encodedBodySize:x.encodedBodySize})),overflow:document.documentElement.scrollWidth>innerWidth}));
   fs.writeFileSync(path.join(output,'browser-results.json'),JSON.stringify({date:new Date().toISOString(),base,browser:browser.version(),results,consoleErrors,requests,metrics},null,2));
