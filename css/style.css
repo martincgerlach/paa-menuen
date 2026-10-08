@@ -20,6 +20,9 @@ shared, mobile-first page and component styles. */
   box-sizing:border-box;
 }
 body {
+  display:flex;
+  flex-direction:column;
+  min-height:100svh;
   margin:0;
   background:var(--color-background);
   color:var(--color-text);
@@ -125,9 +128,11 @@ svg {
   display:none;
 }
 .page-content {
+  flex:1;
+  width:100%;
   max-width:1320px;
   padding:28px 20px 56px;
-  margin:auto;
+  margin:0 auto;
   min-height:100svh;
 }
 .page-heading {
@@ -857,4 +862,19 @@ fieldset label,.checkbox-label {
   .filter-options {
     grid-template-columns:1fr;
   }
+}
+
+/* Short pages fill the page shell; long API pages keep their loading reserve. */
+.page-content--short {
+  min-height:0;
+}
+.site-header,.site-footer {
+  flex-shrink:0;
+}
+/* Keep asynchronous short-page footers hidden until their first state is known. */
+body:has(.page-content--short #retry) .site-footer {
+  visibility:hidden;
+}
+body:has(.page-content--short #status[data-state]:not([data-state=loading])) .site-footer {
+  visibility:visible;
 }
