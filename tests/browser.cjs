@@ -63,6 +63,7 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
   });
   await check('homepage API hero/cards and category link', async () => {
     await visit('index.html'); assert.equal(await page.locator('#home-recipes .recipe-card').count(), 3);
+    assert.equal(await page.getByRole('link', { name: 'Prøv Madterningen', exact: true }).getAttribute('href'), 'madterningen.html');
     await page.locator('.meal-links a').filter({ hasText: 'Aftensmad' }).click(); await listReady();
     assert.equal(await page.locator('#result-count').textContent(), `${data.filter(r => r.mealType.includes('Dinner')).length} opskrifter`);
   });
@@ -79,6 +80,10 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     await visit('favoritter.html'); assert.equal(await page.locator('.recipe-card').count(), 1);
     await page.locator('.favorite-button').click(); assert.equal(await page.locator('.recipe-card').count(), 0);
     await page.reload(); await page.waitForFunction(() => document.querySelector('#status').textContent.includes('ingen favoritter'));
+    const findRecipes = page.getByRole('link', { name: 'Find opskrifter', exact: true });
+    await findRecipes.focus();
+    await Promise.all([page.waitForURL('**/productlist.html'), page.keyboard.press('Enter')]);
+    assert.equal(new URL(page.url()).pathname, '/productlist.html');
   });
   await check('shopping API ingredients, idempotence, purchased persistence, clear and manual creation', async () => {
     await visit('singleproduct.html?id=1', '#recipe-detail h1');
@@ -144,6 +149,19 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     }
   });
   await check('mobile dialog scrolling and keyboard controls',async()=>{await page.setViewportSize({width:390,height:844});await visit('productlist.html');await page.locator('#filter-open').click();await page.locator('#filter-panel input[name=ingredients]').fill('tomat');await page.locator('#filter-apply').click();assert.match(await page.locator('#active-filters').textContent(),/tomat/);});
+  for (const width of [320,390]) await check(`filter labels fit mobile dialog ${width}px`, async()=>{
+    await page.setViewportSize({width,height:844}); await visit('productlist.html'); await page.locator('#filter-open').click();
+    const label = page.locator('#cuisine-options label').filter({hasText:'Middelhavskøkken'});
+    await label.scrollIntoViewIfNeeded();
+    const bounds = await label.evaluate(node=>{
+      const range=document.createRange(); range.selectNodeContents(node);
+      const text=range.getBoundingClientRect(), dialog=document.querySelector('#filter-panel').getBoundingClientRect();
+      return {left:text.left,right:text.right,dialogLeft:dialog.left,dialogRight:dialog.right,overflow:node.parentElement.scrollWidth>node.parentElement.clientWidth+1};
+    });
+    assert.equal(bounds.overflow,false); assert.ok(bounds.left>=bounds.dialogLeft && bounds.right<=bounds.dialogRight);
+    await page.screenshot({path:path.join(output,`filter-label-${width}.png`)});
+    await page.keyboard.press('Escape'); assert.equal(await page.locator('#filter-open').evaluate(el=>el===document.activeElement),true);
+  });
   const metrics = await page.evaluate(()=>({resources:performance.getEntriesByType('resource').map(x=>({url:x.name,duration:x.duration,transferSize:x.transferSize,encodedBodySize:x.encodedBodySize})),overflow:document.documentElement.scrollWidth>innerWidth}));
   fs.writeFileSync(path.join(output,'browser-results.json'),JSON.stringify({date:new Date().toISOString(),base,browser:browser.version(),results,consoleErrors,requests,metrics},null,2));
   await browser.close();if(results.some(r=>r.status==='FAIL'))process.exitCode=1;

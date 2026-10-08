@@ -1,30 +1,139 @@
 <!doctype html>
 <html lang="da">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Find inspiration til dit næste måltid med På Menuen. Udforsk opskrifter, gem favoritter og lav din indkøbsliste.">
-  <title>Forside · På Menuen</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script type="module" src="js/index.js"></script>
-</head>
-<body>
-  <a class="skip-link" href="#main">Spring til indhold</a>
-  <header class="site-header">
-    <a class="logo" href="index.html" aria-label="På Menuen, forside">På Menuen</a>
-    <nav class="desktop-nav" aria-label="Hovednavigation"><a href="index.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>Forside</span></a><a href="productlist.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h5"/></svg><span>Opskrifter</span></a><a href="madterningen.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7 7h.01M17 7h.01M12 12h.01M7 17h.01M17 17h.01"/></svg><span>Madterningen</span></a><a href="favoritter.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5c-3-3-6-1-8 1-2-2-5-4-8-1-5 5 3 11 8 15 5-4 13-10 8-15Z"/></svg><span>Favoritter</span></a><a href="indkoebsliste.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l1 14H3zM8 7V5a4 4 0 0 1 8 0v2"/></svg><span>Indkøbsliste</span></a></nav>
-    <a class="about-link" href="om-os.html">Om os</a>
-    <form class="header-search" action="productlist.html" method="get"><label class="visually-hidden" for="header-q">Søg efter opskrifter</label><input id="header-q" name="q" type="search" placeholder="Søg opskrifter"><button aria-label="Søg" type="submit">⌕</button></form>
-  </header>
-  <main id="main" class="page-content">
-    <p id="storage-notice" class="storage-notice" role="status" hidden></p>
-    <section class="hero-section"><div class="hero-copy"><p class="eyebrow">Hvad skal vi spise i dag?</p><h1>Find dit næste<br>måltid</h1><p>Nem inspiration til hverdagens madvalg.</p><form class="hero-search" action="productlist.html" method="get"><label class="visually-hidden" for="hero-q">Søg efter en opskrift</label><input id="hero-q" type="search" name="q" placeholder="Søg opskrifter"><button class="button" type="submit">Find opskrifter</button></form><a class="text-link" href="madterningen.html">Svært at vælge? Prøv Madterningen →</a></div><div class="hero-image-wrap"><img id="hero-image" src="assets/image-placeholder.svg" alt="" width="640" height="640" fetchpriority="high"></div></section>
-    <nav class="meal-links" aria-label="Find opskrifter efter måltid"><a href="productlist.html?meal=Breakfast">Morgenmad</a><a href="productlist.html?meal=Lunch">Frokost</a><a href="productlist.html?meal=Dinner">Aftensmad</a><a href="productlist.html?meal=Snack">Snacks</a><a href="productlist.html?meal=Dessert">Dessert</a></nav>
-    <section class="dice-banner"><div><p class="eyebrow">Lad tilfældet inspirere dig</p><h2>Slå med Madterningen</h2><p>Få et forslag, når du ikke selv kan vælge.</p></div><a class="button" href="madterningen.html">Find dit næste måltid</a></section>
-    <section class="intro-section"><h2>Hvad er på menuen?</h2><p>Gå på opdagelse i opskrifterne, og find noget, der passer til din hverdag.</p><div id="home-recipes" class="recipe-grid"></div><p id="status" class="status" role="status" aria-live="polite"></p><button id="retry" class="button button-secondary" hidden>Prøv igen</button><a class="button button-secondary" href="productlist.html">Se alle opskrifter</a></section>
-<p class="language-notice">Opskrifter, ingredienser og vejledninger vises på originalsproget fra DummyJSON.</p>
-  </main>
-  <footer class="site-footer"><a class="logo" href="index.html">På Menuen</a><p>Madlavning starter med lidt inspiration.</p><a href="om-os.html">Om os</a><p>Et studieprojekt. Opskriftsdata fra <a href="https://dummyjson.com/docs/recipes">DummyJSON Recipes</a>.</p></footer>
-  <nav class="bottom-nav" aria-label="Mobilnavigation"><a href="index.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>Forside</span></a><a href="productlist.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h5"/></svg><span>Opskrifter</span></a><a href="madterningen.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7 7h.01M17 7h.01M12 12h.01M7 17h.01M17 17h.01"/></svg><span>Madterningen</span></a><a href="favoritter.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5c-3-3-6-1-8 1-2-2-5-4-8-1-5 5 3 11 8 15 5-4 13-10 8-15Z"/></svg><span>Favoritter</span></a><a href="indkoebsliste.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l1 14H3zM8 7V5a4 4 0 0 1 8 0v2"/></svg><span>Indkøbsliste</span></a></nav>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Find inspiration til dit næste måltid med På Menuen. Udforsk opskrifter, gem favoritter og lav din indkøbsliste.">
+    <title>Forside · På Menuen</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/index.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Spring til indhold</a>
+    <header class="site-header">
+      <a class="logo" href="index.html" aria-label="På Menuen, forside">På Menuen</a>
+      <nav class="desktop-nav" aria-label="Hovednavigation">
+        <a href="index.html" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m3 10 9-7 9 7v10H3z"/>
+            <path d="M9 20v-7h6v7"/>
+          </svg>
+          <span>Forside</span>
+        </a>
+        <a href="productlist.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="3" width="16" height="18" rx="2"/>
+            <path d="M8 7h8M8 12h8M8 17h5"/>
+          </svg>
+          <span>Opskrifter</span>
+        </a>
+        <a href="madterningen.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="4"/>
+            <path d="M7 7h.01M17 7h.01M12 12h.01M7 17h.01M17 17h.01"/>
+          </svg>
+          <span>Madterningen</span>
+        </a>
+        <a href="favoritter.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 5c-3-3-6-1-8 1-2-2-5-4-8-1-5 5 3 11 8 15 5-4 13-10 8-15Z"/>
+          </svg>
+          <span>Favoritter</span>
+        </a>
+        <a href="indkoebsliste.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16l1 14H3zM8 7V5a4 4 0 0 1 8 0v2"/>
+          </svg>
+          <span>Indkøbsliste</span>
+        </a>
+      </nav>
+      <a class="about-link" href="om-os.html">Om os</a>
+      <form class="header-search" action="productlist.html" method="get">
+        <label class="visually-hidden" for="header-q">Søg efter opskrifter</label>
+        <input id="header-q" name="q" type="search" placeholder="Søg opskrifter">
+        <button aria-label="Søg" type="submit">⌕</button>
+      </form>
+    </header>
+    <main id="main" class="page-content">
+      <p id="storage-notice" class="storage-notice" role="status" hidden></p>
+      <section class="hero-section">
+        <div class="hero-copy">
+          <p class="eyebrow">Hvad skal vi spise i dag?</p>
+          <h1>Find dit næste<br>måltid</h1>
+          <p>Nem inspiration til hverdagens madvalg.</p>
+          <form class="hero-search" action="productlist.html" method="get">
+            <label class="visually-hidden" for="hero-q">Søg efter en opskrift</label>
+            <input id="hero-q" type="search" name="q" placeholder="Søg opskrifter">
+            <button class="button" type="submit">Find opskrifter</button>
+          </form>
+        </div>
+        <div class="hero-image-wrap">
+          <img id="hero-image" src="assets/image-placeholder.svg" alt="" width="640" height="640" fetchpriority="high">
+        </div>
+      </section>
+      <nav class="meal-links" aria-label="Find opskrifter efter måltid">
+        <a href="productlist.html?meal=Breakfast">Morgenmad</a>
+        <a href="productlist.html?meal=Lunch">Frokost</a>
+        <a href="productlist.html?meal=Dinner">Aftensmad</a>
+        <a href="productlist.html?meal=Snack">Snacks</a>
+        <a href="productlist.html?meal=Dessert">Dessert</a>
+      </nav>
+      <section class="dice-banner">
+        <div>
+          <h2>Slå med Madterningen</h2>
+          <p>Få en tilfældig opskrift, der passer til dine valgte filtre.</p>
+        </div>
+        <a class="button" href="madterningen.html">Prøv Madterningen</a>
+      </section>
+      <section class="intro-section">
+        <h2>Hvad er på menuen?</h2>
+        <p>Filtrér efter tid, eller søg efter en ingrediens.</p>
+        <div id="home-recipes" class="recipe-grid"></div>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+        <button id="retry" class="button button-secondary" hidden>Prøv igen</button>
+        <a class="button button-secondary" href="productlist.html">Se alle opskrifter</a>
+      </section>
+      <p class="language-notice">Opskrifter, ingredienser og vejledninger vises på originalsproget fra DummyJSON.</p>
+    </main>
+    <footer class="site-footer">
+      <a class="logo" href="index.html">På Menuen</a>
+      <a href="om-os.html">Om os</a>
+      <p>Et studieprojekt. Opskriftsdata fra <a href="https://dummyjson.com/docs/recipes">DummyJSON Recipes</a>.</p>
+    </footer>
+    <nav class="bottom-nav" aria-label="Mobilnavigation">
+      <a href="index.html" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m3 10 9-7 9 7v10H3z"/>
+          <path d="M9 20v-7h6v7"/>
+        </svg>
+        <span>Forside</span>
+      </a>
+      <a href="productlist.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="4" y="3" width="16" height="18" rx="2"/>
+          <path d="M8 7h8M8 12h8M8 17h5"/>
+        </svg>
+        <span>Opskrifter</span>
+      </a>
+      <a href="madterningen.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="4"/>
+          <path d="M7 7h.01M17 7h.01M12 12h.01M7 17h.01M17 17h.01"/>
+        </svg>
+        <span>Madterningen</span>
+      </a>
+      <a href="favoritter.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 5c-3-3-6-1-8 1-2-2-5-4-8-1-5 5 3 11 8 15 5-4 13-10 8-15Z"/>
+        </svg>
+        <span>Favoritter</span>
+      </a>
+      <a href="indkoebsliste.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16l1 14H3zM8 7V5a4 4 0 0 1 8 0v2"/>
+        </svg>
+        <span>Indkøbsliste</span>
+      </a>
+    </nav>
+  </body>
 </html>
