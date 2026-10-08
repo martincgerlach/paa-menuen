@@ -366,6 +366,11 @@ label {
 .list-toolbar select {
   margin-top:4px;
 }
+@media (max-width:200px) {
+  .list-toolbar {
+    flex-wrap:wrap;
+  }
+}
 .active-filters {
   display:flex;
   flex-wrap:wrap;
