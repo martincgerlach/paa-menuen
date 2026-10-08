@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lad Madterningen vælge en opskrift blandt dem, der passer til dine aktive filtre.">
+  <title>Madterningen · På Menuen</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/dice-page.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Spring til indhold</a>
+  <header class="site-header">
+    <a class="logo" href="index.html" aria-label="På Menuen, forside">På Menuen</a>
+    <nav class="desktop-nav" aria-label="Hovednavigation"><a href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>Forside</span></a><a href="productlist.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h5"/></svg><span>Opskrifter</span></a><a href="madterningen.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7 7h.01M17 7h.01M12 12h.01M7 17h.01M17 17h.01"/></svg><span>Madterningen</span></a><a href="favoritter.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5c-3-3-6-1-8 1-2-2-5-4-8-1-5 5 3 11 8 15 5-4 13-10 8-15Z"/></svg><span>Favoritter</span></a><a href="indkoebsliste.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l1 14H3zM8 7V5a4 4 0 0 1 8 0v2"/></svg><span>Indkøbsliste</span></a></nav>
+    <a class="about-link" href="om-os.html">Om os</a>
+    <form class="header-search" action="productlist.html" method="get"><label class="visually-hidden" for="header-q">Søg efter opskrifter</label><input id="header-q" name="q" type="search" placeholder="Søg opskrifter"><button aria-label="Søg" type="submit">⌕</button></form>
+  </header>
+  <main id="main" class="page-content">
+    <p id="storage-notice" class="storage-notice" role="status" hidden></p>
+    <div class="page-heading centered"><p class="eyebrow">Inspiration uden beslutningsbesvær</p><h1>Madterningen</h1><p>Slå med terningen og få et forslag til dit næste måltid.</p></div><section class="dice-controls"><div class="dice-mark" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7 7h.01M17 7h.01M12 12h.01M7 17h.01M17 17h.01"/></svg></div><form id="dice-form"><label class="checkbox-label"><input id="use-filters" type="checkbox" checked> Brug mine aktive opskriftsfiltre</label><div id="active-filters" class="active-filters"></div><p><a href="productlist.html">Vælg filtre på opskriftssiden</a></p><button id="dice-roll" class="button" type="submit">Slå med Madterningen</button></form></section><p id="status" class="status" role="status" aria-live="polite"></p><button id="retry" class="button button-secondary" hidden>Prøv igen</button><div id="dice-result" class="dice-result"></div><p class="language-notice">Opskrifter, ingredienser og vejledninger vises på originalsproget fra DummyJSON.</p>
+  </main>
+  <footer class="site-footer"><a class="logo" href="index.html">På Menuen</a><p>Madlavning starter med lidt inspiration.</p><a href="om-os.html">Om os</a><p>Et studieprojekt. Opskriftsdata fra <a href="https://dummyjson.com/docs/recipes">DummyJSON Recipes</a>.</p></footer>
+  <nav class="bottom-nav" aria-label="Mobilnavigation"><a href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg><span>Forside</span></a><a href="productlist.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h5"/></svg><span>Opskrifter</span></a><a href="madterningen.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7 7h.01M17 7h.01M12 12h.01M7 17h.01M17 17h.01"/></svg><span>Madterningen</span></a><a href="favoritter.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5c-3-3-6-1-8 1-2-2-5-4-8-1-5 5 3 11 8 15 5-4 13-10 8-15Z"/></svg><span>Favoritter</span></a><a href="indkoebsliste.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16l1 14H3zM8 7V5a4 4 0 0 1 8 0v2"/></svg><span>Indkøbsliste</span></a></nav>
+</body>
+</html>
