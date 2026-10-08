@@ -58,6 +58,7 @@ h1,h2,h3,p {
   margin-top:0;
 }
 h1 {
+  overflow-wrap:anywhere;
   font-size:32px;
   line-height:1.15;
   letter-spacing:-1px;
@@ -103,6 +104,7 @@ svg {
   top:12px;
 }
 .site-header {
+  flex-wrap:wrap;
   padding:20px;
   display:flex;
   align-items:center;
@@ -286,6 +288,8 @@ label {
   gap:16px;
 }
 .recipe-card {
+  display:flex;
+  flex-direction:column;
   min-width:0;
   position:relative;
   background:white;
@@ -293,6 +297,7 @@ label {
   overflow:hidden;
 }
 .recipe-card>a {
+  flex-shrink:0;
   display:block;
   text-decoration:none;
   color:var(--color-text);
@@ -564,17 +569,7 @@ fieldset label,.checkbox-label {
   padding:10px;
 }
 .about-layout {
-  display:grid;
-  gap:32px;
-}
-.contact-panel {
-  padding:24px;
-  background:white;
-  border:1px solid var(--color-border);
-  border-radius:16px;
-}
-.contact-panel input,.contact-panel textarea {
-  margin-bottom:20px;
+  max-width:700px;
 }
 .site-footer {
   background:white;
@@ -603,6 +598,7 @@ fieldset label,.checkbox-label {
   padding:8px 3px calc(8px + env(safe-area-inset-bottom));
 }
 .bottom-nav a {
+  min-width:0;
   display:flex;
   flex:1;
   flex-direction:column;
@@ -662,9 +658,6 @@ fieldset label,.checkbox-label {
   .detail-grid {
     grid-template-columns:1fr 1fr;
   }
-  .about-layout {
-    grid-template-columns:1fr 1fr;
-  }
 }
 @media (min-width:1100px) {
   .site-header {
@@ -715,11 +708,14 @@ fieldset label,.checkbox-label {
     padding:48px 20px 72px;
   }
   .hero-section {
-    padding:48px;
-    gap:64px;
+    padding:32px;
+    gap:32px;
   }
   .hero-section h1 {
     font-size:56px;
+  }
+  .hero-image-wrap {
+    aspect-ratio:1.7;
   }
   .hero-search .button {
     flex-grow:0;
@@ -769,6 +765,11 @@ fieldset label,.checkbox-label {
   padding:16px;
 }
 .card-body {
+  min-width:0;
+  overflow-wrap:anywhere;
+  display:flex;
+  flex-direction:column;
+  flex:1;
   padding:16px 0 0;
 }
 .card-tags {
@@ -872,9 +873,19 @@ fieldset label,.checkbox-label {
   flex-shrink:0;
 }
 /* Keep asynchronous short-page footers hidden until their first state is known. */
-body:has(.page-content--short #retry) .site-footer {
+body:has(.page-content--async) .site-footer {
   visibility:hidden;
 }
-body:has(.page-content--short #status[data-state]:not([data-state=loading])) .site-footer {
+body:has(.page-content--async #status[data-state]:not([data-state=loading])) .site-footer {
   visibility:visible;
+}
+
+.card-body>.favorite-button {
+  margin-top:auto;
+  align-self:flex-start;
+}
+
+.bottom-nav span {
+  max-width:100%;
+  overflow-wrap:anywhere;
 }
