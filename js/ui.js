@@ -12,6 +12,7 @@ export function status(text, state = '') {
 }
 export function setImage(img, recipe, eager = false) {
   img.alt = recipe.name; img.width = 600; img.height = 400; img.loading = eager ? 'eager' : 'lazy'; img.decoding = 'async';
+  if (eager) img.fetchPriority = 'high';
   img.addEventListener('error', () => { img.hidden = true; const fallback = el('p', 'Billedet er ikke tilgængeligt.', 'image-fallback'); img.after(fallback); }, { once: true });
   if (recipe.image) img.src = recipe.image; else img.hidden = true;
 }
