@@ -113,18 +113,23 @@ svg {
   background:white;
 }
 .logo {
-  display:block;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  max-width:100%;
   font-size:24px;
   font-weight:700;
   text-decoration:none;
-  white-space:nowrap;
+}
+.logo img {
+  display:block;
+  width:32px;
+  height:32px;
+  flex-shrink:0;
 }
 .logo span {
-  display:block;
-  font-size:10px;
-  font-weight:400;
-  letter-spacing:0;
-  margin-top:3px;
+  min-width:0;
+  overflow-wrap:anywhere;
 }
 .desktop-nav,.header-search {
   display:none;
