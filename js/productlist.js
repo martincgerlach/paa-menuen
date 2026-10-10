@@ -14,7 +14,11 @@ const searchForm = document.getElementById('search-form'),
 searchForm.elements.q.value = filters.q;
 function populateOptions() {
   for (const [key, field, id] of [['cuisine', 'cuisine', 'cuisine-options'], ['meal', 'mealType', 'meal-options'], ['difficulty', 'difficulty', 'difficulty-options']]) {
-    const values = [...new Set(recipes.flatMap(r => Array.isArray(r[field]) ? r[field] : [r[field]]).map(x => x === 'Snacks' ? 'Snack' : x).filter(Boolean))].sort((a, b) => displayLabel(a).localeCompare(displayLabel(b), 'da'));
+    const values = [...new Set(recipes
+      .flatMap(r => Array.isArray(r[field]) ? r[field] : [r[field]])
+      .map(x => x === 'Snacks' ? 'Snack' : x)
+      .filter(Boolean))]
+      .sort((a, b) => displayLabel(a).localeCompare(displayLabel(b), 'da'));
     const box = document.getElementById(id);
     box.replaceChildren();
     values.forEach(value => {
@@ -62,6 +66,7 @@ function render() {
     apply();
   });
   status(matches.length ? '' : 'Ingen opskrifter matcher dine valg. Fjern et filter eller prøv en anden søgning.', matches.length ? '' : 'empty');
+  document.getElementById('status').classList.toggle('empty-state', !matches.length);
 }
 function apply(push = true) {
   const query = writeFilters(filters);

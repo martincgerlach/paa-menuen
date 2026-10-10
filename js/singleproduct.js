@@ -32,6 +32,9 @@ await loadWithRetry(async () => {
   add.disabled = !recipe.ingredients.length;
   const availability = el('p', '', 'data-note');
   availability.setAttribute('role', 'status');
+  const feedback = el('p', '', 'status');
+  feedback.id = 'shopping-feedback';
+  feedback.setAttribute('role', 'status');
   function missingIngredients() {
     const indices = [];
     root.querySelectorAll('.ingredient-row input').forEach((input, index) => {
@@ -48,12 +51,12 @@ await loadWithRetry(async () => {
     const before = getShoppingItems(),
       next = addRecipeItems(before, recipe, missingIngredients()),
       persisted = saveShoppingItems(next);
-    status(`${next.length - before.length} ingredienser tilføjet. ${persisted ? 'Gemt på denne enhed.' : 'Kun midlertidigt gemt.'}`);
+    feedback.textContent = `${next.length - before.length} ingredienser tilføjet. ${persisted ? 'Gemt på denne enhed.' : 'Kun midlertidigt gemt.'}`;
   });
   const go = el('a', 'Se indkøbsliste →');
   go.href = 'indkoebsliste.html';
   actions.append(save, add, go);
-  summary.append(h1, rating, tags, meta, timings, actions);
+  summary.append(h1, rating, tags, meta, timings, actions, feedback);
   grid.append(image, summary);
   const body = el('div', undefined, 'recipe-body'),
     ingredients = el('section', undefined, 'ingredient-panel');

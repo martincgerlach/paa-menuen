@@ -15,7 +15,14 @@ function candidates() {
 function preview() {
   showChips(document.getElementById('active-filters'), checkbox.checked ? filters : readFilters(''));
   const count = candidates().length;
-  status(count ? `${count} opskrifter at vælge mellem.${checkbox.checked ? ' Aktive filtre bruges.' : ' Alle opskrifter bruges.'}` : 'Ingen opskrifter matcher. Skift filtre på opskriftssiden eller slå aktive filtre fra.', count ? '' : 'empty');
+  const hasFilters = filters.q || filters.rating !== null
+    || ['cuisine', 'meal', 'time', 'difficulty', 'ingredients'].some(key => filters[key].length);
+  if (!count) {
+    status('Ingen opskrifter matcher. Skift filtre på opskriftssiden eller slå aktive filtre fra.', 'empty');
+  } else {
+    const mode = checkbox.checked && hasFilters ? 'Aktive filtre bruges.' : 'Alle opskrifter bruges.';
+    status(`${count} opskrifter at vælge mellem. ${mode}`);
+  }
   button.disabled = !count;
 }
 checkbox.addEventListener('change', () => {

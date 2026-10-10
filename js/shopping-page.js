@@ -47,9 +47,14 @@ function render() {
       remove.type = 'button';
       remove.setAttribute('aria-label', `Fjern vare: ${item.text}`);
       remove.addEventListener('click', () => {
-        saveShoppingItems(getShoppingItems().filter(x => x.id !== item.id));
+        const buttons = [...root.querySelectorAll('.remove-item')];
+        const index = buttons.indexOf(remove);
+        const persisted = saveShoppingItems(getShoppingItems().filter(x => x.id !== item.id));
         render();
-        status('Varen er fjernet.');
+        const remaining = [...root.querySelectorAll('.remove-item')];
+        const target = remaining[Math.min(index, remaining.length - 1)] || input;
+        target.focus();
+        status(`Varen er fjernet.${persisted ? '' : ' Kun midlertidigt.'}`);
       });
       row.append(label, remove);
       section.append(row);
@@ -81,9 +86,11 @@ input.addEventListener('input', () => {
   error.textContent = '';
 });
 document.getElementById('clear-purchased').addEventListener('click', () => {
-  saveShoppingItems(clearPurchased(getShoppingItems()));
+  const persisted = saveShoppingItems(clearPurchased(getShoppingItems()));
   render();
-  status('Købte varer er ryddet.');
+  const target = root.querySelector('.remove-item') || input;
+  target.focus();
+  status(`Købte varer er ryddet.${persisted ? '' : ' Kun midlertidigt.'}`);
 });
 window.addEventListener('storage', render);
 render();

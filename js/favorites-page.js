@@ -4,18 +4,29 @@ import { initCommon, loadWithRetry, renderRecipes, status } from './ui.js';
 initCommon();
 let recipes = [];
 function render() {
+  const root = document.getElementById('recipe-grid');
+  const buttons = [...root.querySelectorAll('button')];
+  const focusedIndex = buttons.indexOf(document.activeElement);
   const ids = getFavoriteIds(),
     saved = recipes.filter(r => ids.includes(r.id));
-  const root = document.getElementById('recipe-grid');
+  const missing = ids.filter(id => !recipes.some(r => r.id === id));
+  const missingMessage = `${missing.length} gemte opskrifter er ikke længere tilgængelige i API’et.`;
   renderRecipes(root, saved);
-  if (!ids.length) {
+  if (!saved.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    const message = document.createElement('p');
+    message.textContent = ids.length
+      ? missingMessage
+      : 'Du har ingen favoritter endnu.';
     const link = document.createElement('a');
     link.href = 'productlist.html';
     link.textContent = 'Find opskrifter';
-    root.append(link);
+    link.className = 'button button-secondary';
+    empty.append(message, link);
+    root.append(empty);
   }
-  const missing = ids.filter(id => !recipes.some(r => r.id === id));
-  status(!ids.length ? 'Du har ingen favoritter endnu. Find en opskrift og vælg Gem.' : missing.length ? `${missing.length} gemte opskrifter er ikke længere tilgængelige i API’et.` : '', !ids.length ? 'empty' : '');
+  status(saved.length && missing.length ? missingMessage : '');
   missing.forEach(id => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -29,6 +40,12 @@ function render() {
     });
     root.append(button);
   });
+  if (focusedIndex >= 0) {
+    const remaining = [...root.querySelectorAll('button')];
+    const target = remaining[Math.min(focusedIndex, remaining.length - 1)]
+      || root.querySelector('a');
+    target?.focus();
+  }
 }
 document.addEventListener('favorites-changed', render);
 await loadWithRetry(async () => {
