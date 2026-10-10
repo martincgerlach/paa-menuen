@@ -6,30 +6,42 @@ const strings = value => Array.isArray(value) ? value.filter(item => typeof item
 export function normalizeRecipe(raw) {
   if (!raw || !Number.isInteger(raw.id) || raw.id < 1 || typeof raw.name !== 'string' || !raw.name.trim()) throw new Error('Opskriftsdata har et ugyldigt format.');
   return {
-    id: raw.id, name: raw.name, ingredients: strings(raw.ingredients), instructions: strings(raw.instructions),
-    prepTimeMinutes: numberOrNull(raw.prepTimeMinutes), cookTimeMinutes: numberOrNull(raw.cookTimeMinutes),
-    servings: numberOrNull(raw.servings), difficulty: typeof raw.difficulty === 'string' ? raw.difficulty : '',
-    cuisine: typeof raw.cuisine === 'string' ? raw.cuisine : '', tags: strings(raw.tags), mealType: strings(raw.mealType),
+    id: raw.id,
+    name: raw.name,
+    ingredients: strings(raw.ingredients),
+    instructions: strings(raw.instructions),
+    prepTimeMinutes: numberOrNull(raw.prepTimeMinutes),
+    cookTimeMinutes: numberOrNull(raw.cookTimeMinutes),
+    servings: numberOrNull(raw.servings),
+    difficulty: typeof raw.difficulty === 'string' ? raw.difficulty : '',
+    cuisine: typeof raw.cuisine === 'string' ? raw.cuisine : '',
+    tags: strings(raw.tags),
+    mealType: strings(raw.mealType),
     image: typeof raw.image === 'string' && raw.image.startsWith('https://') ? raw.image : '',
-    rating: numberOrNull(raw.rating), reviewCount: numberOrNull(raw.reviewCount)
+    rating: numberOrNull(raw.rating),
+    reviewCount: numberOrNull(raw.reviewCount)
   };
 }
-
 async function request(url, fetcher) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
-    const response = await fetcher(url, { signal: controller.signal });
+    const response = await fetcher(url, {
+      signal: controller.signal
+    });
     if (!response.ok) throw new Error(response.status === 404 ? 'Opskriften blev ikke fundet.' : `Opskrifter kunne ikke hentes (HTTP ${response.status}).`);
     return await response.json();
   } catch (error) {
     if (error.name === 'AbortError') throw new Error('Det tog for lang tid at hente opskrifter. Prøv igen.');
     if (error instanceof TypeError || error instanceof SyntaxError) throw new Error('Opskrifter kunne ikke hentes. Kontrollér forbindelsen og prøv igen.');
     throw error;
-  } finally { clearTimeout(timeout); }
+  } finally {
+    clearTimeout(timeout);
+  }
 }
-
-export async function getRecipes({ fetcher = fetch } = {}) {
+export async function getRecipes({
+  fetcher = fetch
+} = {}) {
   let results = [];
   let total;
   do {
@@ -43,8 +55,9 @@ export async function getRecipes({ fetcher = fetch } = {}) {
   } while (results.length < total);
   return results;
 }
-
-export async function getRecipe(id, { fetcher = fetch } = {}) {
+export async function getRecipe(id, {
+  fetcher = fetch
+} = {}) {
   if (!/^[1-9]\d*$/.test(String(id))) throw new Error('Vælg en gyldig opskrift fra opskriftslisten.');
   const recipe = normalizeRecipe(await request(`${API}/${Number(id)}`, fetcher));
   if (recipe.id !== Number(id)) throw new Error("API'et returnerede en anden opskrift.");
