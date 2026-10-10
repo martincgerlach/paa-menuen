@@ -1,6 +1,15 @@
 import { readStore, writeStore } from './storage.js';
 const key = 'paa-menuen:shopping:v1';
-const validItem = x => x && typeof x.id === 'string' && ['recipe', 'manual'].includes(x.source) && typeof x.text === 'string' && typeof x.checked === 'boolean' && (x.source === 'manual' || Number.isInteger(x.recipeId) && typeof x.recipeName === 'string' && Number.isInteger(x.ingredientIndex));
+const validItem = x => x
+  && typeof x.id === 'string'
+  && ['recipe', 'manual'].includes(x.source)
+  && typeof x.text === 'string'
+  && typeof x.checked === 'boolean'
+  && (x.source === 'manual' || (
+    Number.isInteger(x.recipeId)
+    && typeof x.recipeName === 'string'
+    && Number.isInteger(x.ingredientIndex)
+  ));
 export function getShoppingItems() {
   return readStore(key, [], v => Array.isArray(v) && v.every(validItem));
 }

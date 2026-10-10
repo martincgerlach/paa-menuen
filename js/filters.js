@@ -16,7 +16,17 @@ export function filterRecipes(recipes, f) {
   return recipes.filter(r => {
     const text = normalizeText([r.name, ...r.ingredients].join(' '));
     const time = totalTime(r);
-    return (!f.q || searchTerms(f.q).some(term => text.includes(term))) && (!f.cuisine.length || f.cuisine.includes(r.cuisine)) && (!f.meal.length || r.mealType.some(meal => f.meal.includes(canonicalMeal(meal)))) && (!f.difficulty.length || f.difficulty.includes(r.difficulty)) && (f.rating === null || r.rating !== null && r.rating >= f.rating) && (!f.time.length || time !== null && f.time.some(band => band === 'under30' ? time < 30 : band === '30to45' ? time >= 30 && time <= 45 : time > 45)) && f.ingredients.every(ingredient => r.ingredients.some(item => searchTerms(ingredient).some(term => normalizeText(item).includes(term))));
+    return (!f.q || searchTerms(f.q).some(term => text.includes(term)))
+      && (!f.cuisine.length || f.cuisine.includes(r.cuisine))
+      && (!f.meal.length || r.mealType.some(meal => f.meal.includes(canonicalMeal(meal))))
+      && (!f.difficulty.length || f.difficulty.includes(r.difficulty))
+      && (f.rating === null || r.rating !== null && r.rating >= f.rating)
+      && (!f.time.length || time !== null && f.time.some(band =>
+        band === 'under30' ? time < 30
+          : band === '30to45' ? time >= 30 && time <= 45
+            : time > 45))
+      && f.ingredients.every(ingredient => r.ingredients.some(item =>
+        searchTerms(ingredient).some(term => normalizeText(item).includes(term))));
   });
 }
 export function sortRecipes(recipes, mode) {
