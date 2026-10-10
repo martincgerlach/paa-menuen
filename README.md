@@ -19,8 +19,8 @@ Open http://127.0.0.1:8018/. Use HTTP rather than opening the HTML as files, bec
 - `singleproduct.html?id=1` / `js/singleproduct.js`: fetch the actual recipe by ID, favorite toggle and shopping-list integration.
 - `madterningen.html` / `js/dice-page.js`: random choice from the same active filter pool; explicit switch to all recipes.
 - `favoritter.html` / `js/favorites-page.js`: locally saved recipe IDs, hydrated from API data.
-- `indkoebsliste.html` / `js/shopping-page.js`: source ingredient checklist, manual items, purchased state and removal.
-- `om-os.html` / `js/about.js`: project description and native HTML-validated feedback demonstration. No message is transmitted or retained.
+- `indkoebsliste.html` / `js/shopping-page.js`: source ingredient checklist, purchased state and removal. The working HTML-validated form adds manual shopping items with a required field, a 120-character limit and whitespace validation.
+- `om-os.html` / `js/about.js`: project description. The former feedback demonstration has been removed; this page has no feedback form or message service.
 
 `api.js` fetches/validates/normalizes → `filters.js` selects results → `ui.js` renders DOM nodes. `labels.js` contains category labels and a small explicit Danish ingredient-search alias dictionary. `storage.js` handles persistence failures; `favorites.js` and `shopping.js` own the small local models. CSS holds the shared Hi-Fi tokens and mobile-first layouts. Comments explain non-obvious choices rather than repeat code.
 
@@ -39,7 +39,9 @@ Data remains English for names, ingredients and instructions, with `lang=en`. Da
 - Filters are URL parameters (`q`, `cuisine`, `meal`, `time`, `difficulty`, `rating`, `ingredients`). Active query is shared with Madterningen using sessionStorage. Browser back restores the URL filters. Search is part of the active pool.
 - Madterningen chooses from array elements, not assumed ID ranges. Zero matches disables a roll with a clear explanation; one result may repeat; several results avoid immediately repeating the prior result.
 - Favorites store real recipe IDs in localStorage. Shopping items store source recipe ID/name/ingredient-index/text or a separately labeled manual entry. Identical ingredient text from different recipes is not merged or added as a quantity. Adding the same recipe again adds only absent ingredient rows and preserves checked rows.
-- Detail ingredient checkboxes are a temporary checklist. The clearly labeled action adds **all** ingredients. Purchases in the shopping list persist. Removing favorites never deletes shopping items.
+- Detail ingredient checkboxes mean **already at home** and apply only to the current recipe view. **Tilføj manglende ingredienser** adds only unchecked ingredients, retaining their original API indices. Existing shopping rows are not duplicated or removed. A nearby status reports the actual added count, including zero on repeated additions, and whether storage succeeded.
+- Shopping-list checkboxes mean **purchased** and persist. Removing favorites never deletes shopping items. After removal, keyboard focus moves to the next item, otherwise the previous item; an empty favorites list focuses Find opskrifter, and an empty shopping list focuses the manual-item field.
+- Madterningen reports whether actual filter values are in use or all recipes are available. No matching recipes disables the roll. These messages do not change its selection algorithm.
 - Storage keys begin `paa-menuen:`. Corrupt/unavailable storage falls back in the current page with a visible warning. Temporary fallback is not promised to survive reload/navigation. Nothing synchronizes between devices/accounts.
 
 ## Source and design decisions
@@ -70,6 +72,6 @@ The browser suite uses live API data for normal flows, and clearly scoped respon
 
 ## Git and release
 
-Development branch: `feat/recipes-integration`. Main is unchanged. No remote push, PR, merge or deployment was authorized in this task. GitHub Pages remains an outstanding assignment delivery requirement, not a claimed result. A future authorized release can publish repository-root files without a framework/build. Use relative paths beneath `/paa-menuen/`; rerun live API/links/forms/persistence checks on the public URL after deployment.
+Current local improvement branch: `fix/final-polish-exam-readiness`, created from the clean `feat/brand-logo` commit `e83d4c0`. Earlier integration work is retained. Main is unchanged. No remote push, PR, merge or deployment was authorized in this task. GitHub Pages remains an outstanding assignment delivery requirement, not a claimed result. A future authorized release can publish repository-root files without a framework/build. Use relative paths beneath `/paa-menuen/`; rerun live API/links/forms/persistence checks on the public URL after deployment.
 
 Independent review recommendations are report-only and must not automatically be applied.
