@@ -70,16 +70,57 @@ PLAYWRIGHT_PATH=/path/to/playwright QA_OUTPUT=/path/to/evidence node tests/brows
 
 The browser suite uses live API data for normal flows, and clearly scoped response/network/storage simulations only for error tests. Synthetic logic fixtures are test-only and never served as website recipe data. Browser screenshots, HTML validation and Lighthouse outputs are retained outside the code repository in the parent project's `reports/` folder, including the 11 October visual-polish and release evidence. Runtime errors, simulated failures and measurement limitations are distinguished there.
 
-## Git and release
+## Git – overblik over ændringer og udgivelse
 
-Public website: [På Menuen](https://martincgerlach.github.io/paa-menuen/).
+Dette afsnit er skrevet til projektgruppen og lærerne på 2. semester. Resten af README beskriver den tekniske løsning.
 
-GitHub Pages publishes repository-root files from `main` over HTTPS, without a framework or custom build step. On 11 October 2026, the approved `visuel-polish` implementation (`d031bed`) was merged into `main` by fast-forward and pushed with the user's authorization. Earlier API integration, logo, fixes and exam-readiness commits are retained.
+### Hvad betyder begreberne?
 
-The local branches have short names: `main`, `opskrifter-api`, `logo`, `rettelser-1`, `rettelser-2`, `sortering-mobil`, `eksamensklar` and `visuel-polish`. The development branches are local; this release publishes `main` to GitHub.
+- **Branch:** En arbejdsgren, hvor man kan ændre kode uden at ændre den publicerede hjemmeside.
+- **Commit:** Et gemt trin i arbejdet. Beskeden beskriver, hvad man ændrede.
+- **Pull request (PR):** En gennemgang af de ændringer, man vil lægge ind i `main`.
+- **`main`:** Den fælles version, som GitHub Pages publicerer.
+- **Merge:** Når godkendte ændringer samles i `main`.
 
-For group work, pull the current `main`, create a small branch for your task, and review changes before merging. Pushing to `main` updates the Pages website. Keep relative asset and navigation paths beneath `/paa-menuen/`. The release checks compare public runtime files with the approved implementation and run browser tests on the public URL. Evidence lives in the parent project's `reports/2026-10-11/github-pages-release/` folder.
+### Seneste ændringer
 
-Known native zoom/reflow findings (VP-05) and the proposed ingredient-button move (R2-02) are not resolved by this release; they require separate approval.
+| Commit | Hvad blev ændret? | Se ændringerne |
+| --- | --- | --- |
+| [`638d6b4`](https://github.com/martincgerlach/paa-menuen/commit/638d6b4ed001a87d33c3beeecb180e21071710cf) | Forsiden fik en tydeligere overskrift, et bedre søgefelt, hurtige genveje og et opskriftskort med det rigtige DummyJSON-billede. | [PR #3](https://github.com/martincgerlach/paa-menuen/pull/3) |
+| [`40dedcb`](https://github.com/martincgerlach/paa-menuen/commit/40dedcb63b9d19bc197ab13a8c01c2d1867c36e7) | Overlap mellem opskriftsfoto og tekst blev rettet, og afstande i navigation og Madterningens filtre blev justeret. | [PR #2](https://github.com/martincgerlach/paa-menuen/pull/2) |
+| [`b127fa4`](https://github.com/martincgerlach/paa-menuen/commit/b127fa4b83d6d804bfd5af89ab805baafe30edad) | Madterningen fik en tydeligere starttekst, en nulstil-knap, der kun vises ved aktive filtre, og en resultatoverskrift. | [PR #1](https://github.com/martincgerlach/paa-menuen/pull/1) |
+| [`d701019`](https://github.com/martincgerlach/paa-menuen/commit/d70101985c3a905509f72d46e23d1bd88c4cc58b) | Madterningens filtre blev enklere, og terningen blev mere fremtrædende. | [Commit](https://github.com/martincgerlach/paa-menuen/commit/d70101985c3a905509f72d46e23d1bd88c4cc58b) |
+| [`d0b84ed`](https://github.com/martincgerlach/paa-menuen/commit/d0b84ed925958c9d9761566764e86fe8ffce2308) | Madterningen fik en klikbar 3D-terning og direkte filtre på siden. | [Commit](https://github.com/martincgerlach/paa-menuen/commit/d0b84ed925958c9d9761566764e86fe8ffce2308) |
 
-Independent review recommendations are report-only and must not automatically be applied.
+Denne tabel er en hjælp til at læse Git-historikken. Den er ikke en erstatning for den fulde [commithistorik](https://github.com/martincgerlach/paa-menuen/commits/main/).
+
+### Sådan navngiver vi branches og commits fremover
+
+Brug korte, beskrivende navne på dansk, gerne uden æ, ø og å i selve branchnavnet:
+
+| Eksempel på branch | Hvad arbejdes der på? |
+| --- | --- |
+| `forside-sogning` | Forsidens søgning |
+| `madterning-filtre` | Filtrene på Madterningen |
+| `mobil-layout` | Tilpasninger til mobil |
+| `ret-opskriftskort` | Layout og visning af opskrifter |
+| `git-overblik` | Forklaring af Git-arbejdet |
+
+Brug én konkret handling i commitbeskeden, så man kan forstå ændringen uden at åbne koden. Eksempler:
+
+- `Forbedr søgefeltet på forsiden`
+- `Ret overlap mellem billede og opskriftskort`
+- `Gør Madterningens filtre nemmere at bruge`
+- `Test hjemmesiden på mobil og store skærme`
+
+Hold ændringerne små. Lav en ny branch fra den aktuelle `main`, gem ændringerne med commits, test dem og opret en pull request, før de flettes ind i `main`.
+
+**Hvorfor ændrer vi ikke gamle commit- og branchnavne?** Git-commits har faste ID'er. Ændres gamle commitbeskeder, skal historikken omskrives, hvilket kan skabe problemer for gruppens øvrige kopier. Ældre, allerede mergede branches beholdes af hensyn til historikken. Derfor forklares deres ændringer her i stedet for at omskrive dem.
+
+### Test og publicering
+
+På Menuen: https://martincgerlach.github.io/paa-menuen/
+
+GitHub Pages publicerer repositoryets rodindhold fra `main` over HTTPS. De seneste ændringer i tabellen blev publiceret via GitHub Pages. Forsidens designændringer blev testet med 34 målrettede browserkontroller og 77 responsive layoutkontroller på syv sider og 11 skærmstørrelser før udgivelse. Det er automatiske kontroller – ikke en brugertest med deltagere.
+
+De tidligere godkendte ændringer til `visuel-polish` og tilhørende release-evidens er fortsat en del af Git-historikken. Kendte forslag om browserzoom/reflow (VP-05) og placering af ingrediensknappen (R2-02) er ikke automatisk blevet implementeret. Yderligere ændringer kræver særskilt gennemgang.
