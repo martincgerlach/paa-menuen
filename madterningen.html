@@ -60,77 +60,11 @@
     </header>
     <main id="main" class="page-content page-content--short page-content--async">
       <p id="storage-notice" class="storage-notice" role="status" hidden></p>
-      <div class="page-heading centered">
-        <p class="eyebrow">Inspiration uden beslutningsbesvær</p>
+      <div class="page-heading centered dice-heading">
         <h1>Madterningen</h1>
-        <p>Slå med terningen og få et forslag til dit næste måltid.</p>
+        <p>Lad terningen vælge dit næste måltid.</p>
       </div>
       <form id="dice-filters" class="dice-filters" aria-label="Vælg opskriftsfiltre">
-        <fieldset id="dice-preferences" disabled>
-          <legend class="visually-hidden">Dine madpræferencer</legend>
-          <!-- Skjulte chip-former holder pladsen, indtil API-valgene er klar. -->
-          <div class="dice-primary-filters">
-            <fieldset>
-              <legend>Måltid</legend>
-              <div id="dice-meals" class="dice-choices">
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Alle</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Morgenmad</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Frokost</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Aftensmad</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Snack</span>
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend>Samlet tid</legend>
-              <div id="dice-times" class="dice-choices">
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Alle tider</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Under 30 min</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>30–45 min</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Over 45 min</span>
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend>Sværhedsgrad</legend>
-              <div id="dice-difficulties" class="dice-choices">
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Alle niveauer</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Let</span>
-                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Middel</span>
-              </div>
-            </fieldset>
-          </div>
-          <details class="dice-more-filters">
-            <summary>Flere filtre</summary>
-            <div class="dice-advanced-fields">
-              <fieldset>
-                <legend>Køkken</legend>
-                <div id="dice-cuisines" class="dice-choices"></div>
-              </fieldset>
-              <div>
-                <label for="dice-rating">Minimum bedømmelse</label>
-                <select id="dice-rating" name="rating">
-                  <option value="">Alle bedømmelser</option>
-                  <option value="4">4+ stjerner</option>
-                  <option value="4.5">4,5+ stjerner</option>
-                  <option value="4.8">4,8+ stjerner</option>
-                </select>
-              </div>
-              <div>
-                <label for="dice-ingredients">Ingredienser hjemme</label>
-                <input id="dice-ingredients" name="ingredients" type="text" placeholder="Fx kylling, ris">
-                <p class="dice-filter-help">Adskil med komma. Opskriften skal indeholde alle valgte ingredienser.</p>
-              </div>
-              <div>
-                <label for="dice-search">Søg i opskrifter</label>
-                <input id="dice-search" name="q" type="search" maxlength="120" placeholder="Navn eller ingrediens">
-              </div>
-            </div>
-          </details>
-          <div class="dice-filter-summary">
-            <p id="match-count">Henter opskrifter…</p>
-            <button id="dice-reset" class="button button-secondary" type="button">Nulstil filtre</button>
-          </div>
-          <div id="active-filters" class="active-filters"></div>
-        </fieldset>
         <section id="dice-panel" class="dice-panel" aria-label="Kast med Madterningen">
           <div class="dice-controls">
             <p class="dice-caption">Hvad skal vi spise?</p>
@@ -147,8 +81,70 @@
               </span>
             </button>
             <p id="dice-instruction">Klik på terningen for at kaste</p>
-            <p id="status" class="status" role="status" aria-live="polite"></p>
+            <p id="status" class="status visually-hidden" role="status" aria-live="polite"></p>
             <button id="retry" class="button button-secondary" type="button" hidden>Prøv igen</button>
+          </div>
+          <div class="dice-filter-panel">
+            <fieldset id="dice-preferences" disabled>
+              <legend class="visually-hidden">Dine madpræferencer</legend>
+              <div class="dice-filter-summary">
+                <p id="match-count">Henter opskrifter…</p>
+                <button id="dice-reset" class="button button-secondary" type="button">Nulstil filtre</button>
+              </div>
+              <p class="dice-filter-help">Vil du have noget bestemt? Vælg dine filtre.</p>
+              <details id="dice-filter-options" class="dice-filter-options">
+                <summary>Vælg filtre <span>(valgfrit)</span></summary>
+                <div class="dice-primary-filters">
+                  <div>
+                    <label for="dice-meals">Måltid</label>
+                    <select id="dice-meals" name="meal">
+                      <option value="">Alle</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="dice-times">Samlet tid</label>
+                    <select id="dice-times" name="time">
+                      <option value="">Alle tider</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="dice-difficulties">Sværhedsgrad</label>
+                    <select id="dice-difficulties" name="difficulty">
+                      <option value="">Alle niveauer</option>
+                    </select>
+                  </div>
+                </div>
+                <p id="dice-imported-note" class="dice-filter-help" hidden>Flere valg fra opskriftssiden er bevaret. Vælg én mulighed her, eller fjern enkelte filtre nedenfor.</p>
+                <details id="dice-more-filters" class="dice-more-filters">
+                  <summary>Flere filtre</summary>
+                  <div class="dice-advanced-fields">
+                    <fieldset>
+                      <legend>Køkken</legend>
+                      <div id="dice-cuisines" class="dice-choices"></div>
+                    </fieldset>
+                    <div>
+                      <label for="dice-rating">Minimum bedømmelse</label>
+                      <select id="dice-rating" name="rating">
+                        <option value="">Alle bedømmelser</option>
+                        <option value="4">4+ stjerner</option>
+                        <option value="4.5">4,5+ stjerner</option>
+                        <option value="4.8">4,8+ stjerner</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label for="dice-ingredients">Ingredienser hjemme</label>
+                      <input id="dice-ingredients" name="ingredients" type="text" placeholder="Fx kylling, ris">
+                      <p class="dice-filter-help">Adskil med komma. Opskriften skal indeholde alle valgte ingredienser.</p>
+                    </div>
+                    <div>
+                      <label for="dice-search">Søg i opskrifter</label>
+                      <input id="dice-search" name="q" type="search" maxlength="120" placeholder="Navn eller ingrediens">
+                    </div>
+                  </div>
+                </details>
+              </details>
+              <div id="active-filters" class="active-filters"></div>
+            </fieldset>
           </div>
           <div id="dice-result" class="dice-result">
             <div class="dice-result-placeholder">
