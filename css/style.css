@@ -580,8 +580,8 @@ fieldset label,.checkbox-label {
 }
 .dice-primary-filters {
   display:grid;
-  gap:12px;
-  margin:16px 0;
+  gap:8px;
+  margin:10px 0 12px;
 }
 .dice-primary-filters>div {
   display:grid;
@@ -691,12 +691,12 @@ fieldset label,.checkbox-label {
   flex-wrap:wrap;
   align-items:center;
   justify-content:space-between;
-  gap:12px;
-  margin-top:16px;
+  gap:8px;
+  margin-top:12px;
 }
 .dice-filter-summary p {
   flex-basis:100%;
-  min-height:2.8em;
+  min-height:0;
   margin:0;
   font-weight:600;
 }
@@ -717,7 +717,7 @@ fieldset label,.checkbox-label {
 }
 .dice-filter-panel {
   min-width:0;
-  padding:0 20px 20px;
+  padding:0 20px 16px;
   background:var(--color-sage);
   border-bottom:1px solid var(--color-border);
 }
@@ -1056,16 +1056,22 @@ fieldset label,.checkbox-label {
     align-items:center;
   }
   .detail-grid {
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:24px;
   }
 }
 @media (min-width:1100px) {
   .site-header {
     padding:24px max(40px,calc((100% - 1280px)/2));
+    justify-content:flex-start;
+    gap:clamp(12px,1.5vw,24px);
+  }
+  .site-header>.logo {
+    margin-right:clamp(12px,2vw,36px);
   }
   .desktop-nav {
     display:flex;
-    gap:20px;
+    gap:clamp(8px,1.1vw,20px);
   }
   .desktop-nav a {
     display:flex;
@@ -1090,6 +1096,8 @@ fieldset label,.checkbox-label {
   .header-search {
     display:flex;
     max-width:190px;
+    flex:0 0 190px;
+    margin-left:auto;
     position:relative;
   }
   .header-search input {
@@ -1113,6 +1121,9 @@ fieldset label,.checkbox-label {
   .hero-section {
     padding:32px;
     gap:32px;
+  }
+  .detail-image {
+    aspect-ratio:4 / 3;
   }
   .hero-section h1 {
     font-size:56px;
@@ -1279,7 +1290,7 @@ fieldset label,.checkbox-label {
   }
   .detail-summary {
     position:relative;
-    margin-left:-48px;
+    margin-left:0;
     align-self:center;
   }
   .dice-panel {
