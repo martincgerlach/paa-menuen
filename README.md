@@ -68,10 +68,18 @@ Browser verification uses a separately available Playwright installation and Chr
 PLAYWRIGHT_PATH=/path/to/playwright QA_OUTPUT=/path/to/evidence node tests/browser.cjs
 ```
 
-The browser suite uses live API data for normal flows, and clearly scoped response/network/storage simulations only for error tests. Synthetic logic fixtures are test-only and never served as website recipe data. Browser screenshots, HTML validation and Lighthouse outputs are retained outside the code repository in the parent project's `reports/2026-10-08/` folder. Runtime errors, simulated failures and measurement limitations are distinguished there.
+The browser suite uses live API data for normal flows, and clearly scoped response/network/storage simulations only for error tests. Synthetic logic fixtures are test-only and never served as website recipe data. Browser screenshots, HTML validation and Lighthouse outputs are retained outside the code repository in the parent project's `reports/` folder, including the 11 October visual-polish and release evidence. Runtime errors, simulated failures and measurement limitations are distinguished there.
 
 ## Git and release
 
-Current local improvement branch: `fix/final-polish-exam-readiness`, created from the clean `feat/brand-logo` commit `e83d4c0`. Earlier integration work is retained. Main is unchanged. No remote push, PR, merge or deployment was authorized in this task. GitHub Pages remains an outstanding assignment delivery requirement, not a claimed result. A future authorized release can publish repository-root files without a framework/build. Use relative paths beneath `/paa-menuen/`; rerun live API/links/forms/persistence checks on the public URL after deployment.
+Public website: [På Menuen](https://martincgerlach.github.io/paa-menuen/).
+
+GitHub Pages publishes repository-root files from `main` over HTTPS, without a framework or custom build step. On 11 October 2026, the approved `visuel-polish` implementation (`d031bed`) was merged into `main` by fast-forward and pushed with the user's authorization. Earlier API integration, logo, fixes and exam-readiness commits are retained.
+
+The local branches have short names: `main`, `opskrifter-api`, `logo`, `rettelser-1`, `rettelser-2`, `sortering-mobil`, `eksamensklar` and `visuel-polish`. The development branches are local; this release publishes `main` to GitHub.
+
+For group work, pull the current `main`, create a small branch for your task, and review changes before merging. Pushing to `main` updates the Pages website. Keep relative asset and navigation paths beneath `/paa-menuen/`. The release checks compare public runtime files with the approved implementation and run browser tests on the public URL. Evidence lives in the parent project's `reports/2026-10-11/github-pages-release/` folder.
+
+Known native zoom/reflow findings (VP-05) and the proposed ingredient-button move (R2-02) are not resolved by this release; they require separate approval.
 
 Independent review recommendations are report-only and must not automatically be applied.
