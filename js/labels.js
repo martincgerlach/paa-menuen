@@ -148,12 +148,16 @@ export function searchTerms(value) {
 }
 
 // Et kort ord må ikke ramme et andet ord: "egg" er ikke "eggplant".
-function containsTerm(text, term) {
-  if (term.length > 3) return text.includes(term);
-  return text.split(/[^a-z0-9]+/).includes(term);
+function containsTerm(text, term, alias) {
+  if (!alias && term.length > 3) return text.includes(term);
+  // Engelske oversættelser skal ramme hele ord, så fx "meat" ikke rammer "meatless".
+  const words = text.split(/[^a-z0-9]+/);
+  const phrase = term.split(' ');
+  return words.some((word, index) => phrase.every((part, offset) => words[index + offset] === part));
 }
 
 export function matchesSearch(value, query) {
   const text = normalizeText(value);
-  return searchTerms(query).some(term => containsTerm(text, normalizeText(term)));
+  const original = normalizeText(query);
+  return searchTerms(query).some(term => containsTerm(text, normalizeText(term), term !== original));
 }
