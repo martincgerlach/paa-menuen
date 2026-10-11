@@ -1,0 +1,52 @@
+name: Test terningeikon i navigation
+
+on:
+  push:
+    branches: [madterning-ikon-navigation]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-navigation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installér Chromium og Playwright
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Start hjemmesiden lokalt fra testbranchen
+        run: |
+          python3 -m http.server 8018 --bind 127.0.0.1 > /tmp/paamenuen.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8018/index.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/paamenuen.log
+          exit 1
+      - name: Kontrollér ikonet på 7 sider og 10 skærmstørrelser
+        env:
+          QA_URL: http://127.0.0.1:8018/
+          QA_OUTPUT: qa-navigation
+        run: node tests/navigation-icon-qa.cjs
+      - name: Kontrollér sidernes øvrige layout
+        env:
+          QA_URL: http://127.0.0.1:8018/
+          QA_OUTPUT: qa-layout
+        run: node tests/layout-viewport.cjs
+      - name: Gem screenshots og testresultater
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: terningeikon-test
+          path: |
+            qa-navigation/
+            qa-layout/
+          if-no-files-found: warn
+          retention-days: 14
