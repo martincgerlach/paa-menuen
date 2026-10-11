@@ -70,6 +70,17 @@ fs.mkdirSync(output,{recursive:true});
             if(screenshotSizes.has(width))await page.screenshot({path:path.join(output,'madterningen-filters-'+width+'.png'),fullPage:true,animations:'disabled'});
             await page.locator('#dice-roll').click();
             await page.locator('.dice-result .recipe-card').waitFor({timeout:5000});
+            // Vent på selve API-fotografiet, så billedet ikke fremstår tomt i screenshots.
+            await page.waitForFunction(() => {
+              const img = document.querySelector('.dice-result .recipe-card img');
+              return Boolean(img && img.complete);
+            }, null, {timeout:20000});
+            const imageState = await page.locator('.dice-result .recipe-card img').evaluate(img => ({
+              width:img.naturalWidth,
+              hidden:img.hidden,
+              src:img.currentSrc
+            }));
+            assert(imageState.width>0 && !imageState.hidden, 'Opskriftsbillede blev ikke indlæst: '+imageState.src);
             if(screenshotSizes.has(width))await page.screenshot({path:path.join(output,'madterningen-result-'+width+'.png'),fullPage:true,animations:'disabled'});
           } else if(screenshotSizes.has(width)){
             await page.screenshot({path:path.join(output,name+'-'+width+'.png'),fullPage:true,animations:'disabled'});
