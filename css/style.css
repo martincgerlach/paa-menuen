@@ -580,13 +580,13 @@ fieldset label,.checkbox-label {
 }
 .dice-primary-filters {
   display:grid;
-  gap:8px;
-  margin:10px 0 12px;
+  gap:6px;
+  margin:4px 0 8px;
 }
 .dice-primary-filters>div {
   display:grid;
   grid-template-columns:105px minmax(0,1fr);
-  gap:10px;
+  gap:8px;
   align-items:center;
 }
 .dice-primary-filters label {
@@ -597,9 +597,10 @@ fieldset label,.checkbox-label {
 .dice-primary-filters select {
   width:100%;
   min-width:0;
-  min-height:44px;
-  padding:8px;
+  height:44px;
+  padding:6px 10px;
   font-size:14px;
+  border-radius:10px;
 }
 .dice-primary-filters select.is-selected {
   border-color:var(--color-primary);
@@ -646,20 +647,27 @@ fieldset label,.checkbox-label {
   outline-offset:3px;
 }
 .dice-more-filters {
-  margin-top:20px;
-  padding:16px 0;
+  margin-top:8px;
+  padding:8px 0 0;
   border-top:1px solid var(--color-border);
-  border-bottom:1px solid var(--color-border);
 }
 .dice-more-filters summary {
   cursor:pointer;
+  font-size:14px;
   font-weight:600;
+  line-height:24px;
   min-height:44px;
+  padding:10px 8px;
+  border-radius:8px;
+  color:var(--color-primary);
+}
+.dice-more-filters summary:hover {
+  background:rgb(255 255 255 / 50%);
 }
 .dice-advanced-fields {
   display:grid;
-  gap:20px;
-  padding-top:20px;
+  gap:12px;
+  padding-top:12px;
 }
 .dice-advanced-fields fieldset {
   min-width:0;
@@ -717,7 +725,7 @@ fieldset label,.checkbox-label {
 }
 .dice-filter-panel {
   min-width:0;
-  padding:0 20px 16px;
+  padding:0 20px 12px;
   background:var(--color-sage);
   border-bottom:1px solid var(--color-border);
 }
@@ -1415,6 +1423,13 @@ body:has(.page-content--async #status[data-state]:not([data-state=loading])) .si
   overflow-wrap:anywhere;
 }
 
+@media (min-width:700px) and (max-width:849px) {
+  /* Smalle desktoppaneler skal ikke presse dropdowns ind i en for smal kolonne. */
+  .dice-primary-filters>div {
+    grid-template-columns:minmax(0,1fr);
+    gap:4px;
+  }
+}
 @media (min-width:700px) {
   .dice-advanced-fields {
     grid-template-columns:1fr;
