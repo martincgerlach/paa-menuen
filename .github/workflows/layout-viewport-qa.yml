@@ -1,0 +1,45 @@
+name: Layout viewport QA (development branch)
+
+on:
+  push:
+    branches: [layout-spacing-fixes]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  responsive-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Start local site
+        run: |
+          python3 -m http.server 8018 --bind 127.0.0.1 > /tmp/paa-menuen-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8018/madterningen.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/paa-menuen-http.log
+          exit 1
+      - name: Run responsive layout suite
+        env:
+          QA_URL: http://127.0.0.1:8018/
+          QA_OUTPUT: qa-evidence
+        run: node tests/layout-viewport.cjs
+      - name: Upload viewport screenshots and results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: layout-viewport-qa
+          path: qa-evidence/
+          if-no-files-found: warn
+          retention-days: 7
