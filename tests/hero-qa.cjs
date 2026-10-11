@@ -93,6 +93,17 @@ fs.mkdirSync(output,{recursive:true});
           await page.locator('#result-count').waitFor({timeout:20000});
         });
       }
+      if(width===390){
+        await check(prefix+' reduced motion disables autoplay but keeps manual arrows',async()=>{
+          await page.emulateMedia({reducedMotion:'reduce'});
+          await page.goto(base+'index.html',{waitUntil:'domcontentloaded'});
+          await page.locator('#hero-next:visible').waitFor({timeout:20000});
+          assert.equal(await page.locator('#hero-pause').isVisible(),false);
+          const before=await page.locator('#hero-recipe-link').getAttribute('href');
+          await page.locator('#hero-next').click();
+          await page.waitForFunction(href=>document.querySelector('#hero-recipe-link')?.getAttribute('href')!==href,before,{timeout:12000});
+        });
+      }
       if(width===1440){
         await check(prefix+' automatic slide changes after seven seconds',async()=>{
           await page.goto(base+'index.html',{waitUntil:'domcontentloaded'});
