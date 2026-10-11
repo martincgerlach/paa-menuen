@@ -117,3 +117,18 @@ test('full original ingredient names can be searched without changing the recipe
   }
   assert.deepEqual(data[0].ingredients, original);
 });
+
+test('additional Danish names and spaced ingredient terms match the English API data', () => {
+  const items = [
+    recipe(1, 20, { ingredients: ['Asparagus spears, trimmed', 'Chicken breast'] }),
+    recipe(2, 20, { ingredients: ['Ground beef', 'Red onions', 'Garlic'] }),
+    recipe(3, 20, { ingredients: ['Sour cream', 'Chia seeds', 'Zucchini'] })
+  ];
+  const ids = q => filterRecipes(items, { ...emptyFilters(), q }).map(r => r.id);
+  assert.deepEqual(ids('asparges'), [1]);
+  assert.deepEqual(ids('hakket kød'), [2]);
+  assert.deepEqual(ids('rød løg'), [2]);
+  assert.deepEqual(ids('chiafrø'), [3]);
+  assert.deepEqual(ids('squash'), [3]);
+  assert.deepEqual(ids('cremefraiche'), [3]);
+});
