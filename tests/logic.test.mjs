@@ -82,3 +82,38 @@ test('missing ingredient selection preserves original indices and stored purchas
   assert.equal(addRecipeItems(missing, r, [0]).length, 3);
   assert.deepEqual(r.ingredients, ['First', 'Second', 'Third']);
 });
+
+
+test('Danish search words find the correct ingredient, without false eggplant matches', () => {
+  const data = [
+    recipe(1, 20, { name: 'Beef stew', ingredients: ['Ground beef', 'Onions', 'Garlic'] }),
+    recipe(2, 20, { name: 'Chicken rice', ingredients: ['Chicken breast', 'Cooked rice'] }),
+    recipe(3, 20, { name: 'Scrambled eggs', ingredients: ['Eggs', 'Butter'] }),
+    recipe(4, 20, { name: 'Vegan eggplant', ingredients: ['Eggplant, sliced', 'Tomatoes'] }),
+    recipe(5, 20, { name: 'Egg salad', ingredients: ['Egg yolks', 'Mayonnaise'] })
+  ];
+  const ids = term => filterRecipes(data, { ...emptyFilters(), q: term }).map(r => r.id);
+  assert.deepEqual(ids('kød'), [1, 2]);
+  assert.deepEqual(ids('KØD'), [1, 2]);
+  assert.deepEqual(ids('æg'), [3, 5]);
+  assert.deepEqual(ids('AEG'), [3, 5]);
+  assert.deepEqual(ids('tomater'), [4]);
+  assert.deepEqual(ids('hvidløg'), [1]);
+  assert.deepEqual(ids('løg'), [1]);
+  assert.deepEqual(ids('ris'), [2]);
+  assert.deepEqual(ids('aubergine'), [4]);
+  assert.deepEqual(ids('egg'), [3, 5]);
+  assert.deepEqual(ids('eggplant'), [4]);
+  assert.deepEqual(filterRecipes(data, { ...emptyFilters(), ingredients: ['æg'] }).map(r => r.id), [3, 5]);
+  assert.deepEqual(filterRecipes(data, { ...emptyFilters(), ingredients: ['kød', 'hvidløg'] }).map(r => r.id), [1]);
+});
+
+test('full original ingredient names can be searched without changing the recipes', () => {
+  const original = ['Soy sauce', 'Soft-boiled eggs', 'Tomato sauce', 'Fresh parsley, chopped'];
+  const data = [recipe(1, 20, { ingredients: original })];
+  for (const ingredient of original) {
+    assert.equal(filterRecipes(data, { ...emptyFilters(), q: ingredient }).length, 1);
+    assert.equal(filterRecipes(data, { ...emptyFilters(), ingredients: [ingredient] }).length, 1);
+  }
+  assert.deepEqual(data[0].ingredients, original);
+});
