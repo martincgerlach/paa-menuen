@@ -73,7 +73,10 @@ await loadWithRetry(async () => {
     input.type = 'checkbox';
     input.id = `ingredient-${index}`;
     input.setAttribute('aria-describedby', 'ingredient-help');
-    input.addEventListener('change', updateIngredients);
+    input.addEventListener('change', () => {
+      row.classList.toggle('is-selected', input.checked);
+      updateIngredients();
+    });
     const span = el('span', text);
     span.lang = 'en';
     row.append(input, span);

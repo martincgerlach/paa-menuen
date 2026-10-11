@@ -51,6 +51,9 @@ function draftFilters() {
   return draft;
 }
 function updatePreview() {
+  form.querySelectorAll('input[type=checkbox]').forEach(input => {
+    input.parentElement.classList.toggle('is-selected', input.checked);
+  });
   document.getElementById('filter-apply').textContent = `Vis ${filterRecipes(recipes, draftFilters()).length} opskrifter`;
 }
 function render() {
