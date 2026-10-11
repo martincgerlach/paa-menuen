@@ -47,7 +47,24 @@ export function favoriteButton(recipe) {
     const result = toggleFavorite(recipe.id);
     refresh();
     document.dispatchEvent(new CustomEvent('favorites-changed'));
-    status(`${result.saved ? 'Opskriften er gemt.' : 'Opskriften er fjernet fra favoritter.'}${result.persisted ? '' : ' Kun midlertidigt.'}`);
+    const message = `${result.saved ? 'Opskriften er gemt.' : 'Opskriften er fjernet fra favoritter.'}${result.persisted ? '' : ' Kun midlertidigt.'}`;
+    // Lagringsfejlen annonceres i favoritbeskeden; banneret er stadig synligt.
+    if (!result.persisted) {
+      document.getElementById('storage-notice')?.setAttribute('aria-live', 'off');
+    }
+    status(message);
+    // Ved fjernelse fra favoritter bruges den kontrol, som allerede har fået fokus.
+    const target = button.isConnected ? button : document.activeElement;
+    const container = target?.closest('.card-body, .detail-actions, .empty-state');
+    if (container) {
+      let feedback = container.querySelector('.local-favorite-feedback');
+      if (!feedback) {
+        feedback = el('span', '', 'local-favorite-feedback');
+        feedback.setAttribute('aria-hidden', 'true');
+        container.append(feedback);
+      }
+      feedback.textContent = message;
+    }
   });
   return button;
 }
