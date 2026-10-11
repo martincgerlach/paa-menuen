@@ -64,6 +64,7 @@ const aliases = {
   reje: ['shrimp', 'prawn', 'prawns'],
   rejer: ['shrimp', 'prawn', 'prawns'],
   aeg: ['egg', 'eggs'],
+  egg: ['egg', 'eggs'],
   aeggeblomme: ['egg yolk', 'egg yolks'],
   aeggehvide: ['egg white', 'egg whites'],
   aubergine: ['eggplant', 'eggplants'],
