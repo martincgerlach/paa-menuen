@@ -426,6 +426,10 @@ label {
   background:rgb(255 255 255 / 92%);
   box-shadow:0 3px 12px rgb(0 0 0 / 12%);
 }
+.hero-image-controls[hidden],
+.hero-image-controls button[hidden] {
+  display:none;
+}
 .hero-image-controls button {
   display:inline-flex;
   align-items:center;
