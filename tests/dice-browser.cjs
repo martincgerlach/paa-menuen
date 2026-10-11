@@ -31,6 +31,11 @@ fs.mkdirSync(output, { recursive: true });
     await page.goto(`${base}madterningen.html${query}`);
     await page.waitForFunction(() => !document.querySelector('#dice-preferences').disabled);
   }
+  async function openFilters() {
+    if (!await page.locator('#dice-filter-options').evaluate(e => e.open)) {
+      await page.locator('#dice-filter-options>summary').click();
+    }
+  }
   async function roll(method = 'click') {
     const before = await page.locator('.recipe-card').count() ? await page.locator('.recipe-card').getAttribute('data-recipe-id') : null;
     if (method === 'click') await page.locator('#dice-roll').click();
@@ -97,7 +102,8 @@ fs.mkdirSync(output, { recursive: true });
   const meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack'].filter(value => data.some(r => r.mealType.includes(value) || value === 'Snack' && r.mealType.includes('Snacks')));
   for (const meal of meals) await check(`meal ${meal}: real count and matching recipe`, async () => {
     await page.locator('#dice-reset').click();
-    await page.locator(`input[name=meal][value="${meal}"]`).check();
+    await openFilters();
+    await page.locator('#dice-meals').selectOption(meal);
     const matches = data.filter(r => r.mealType.some(m => (m === 'Snacks' ? 'Snack' : m) === meal));
     assert.equal(await count(), matches.length);
     const id = await roll();
@@ -105,7 +111,8 @@ fs.mkdirSync(output, { recursive: true });
   });
   for (const time of ['under30', '30to45', 'over45']) await check(`time ${time}: existing prep + cook calculation`, async () => {
     await page.locator('#dice-reset').click();
-    await page.locator(`input[name=time][value="${time}"]`).check();
+    await openFilters();
+    await page.locator('#dice-times').selectOption(time);
     const matches = data.filter(r => {
       const t = r.prepTimeMinutes + r.cookTimeMinutes;
       return time === 'under30' ? t < 30 : time === '30to45' ? t >= 30 && t <= 45 : t > 45;
@@ -116,28 +123,32 @@ fs.mkdirSync(output, { recursive: true });
   });
   for (const difficulty of [...new Set(data.map(r => r.difficulty))]) await check(`difficulty ${difficulty}: supported values only`, async () => {
     await page.locator('#dice-reset').click();
-    await page.locator(`input[name=difficulty][value="${difficulty}"]`).check();
+    await openFilters();
+    await page.locator('#dice-difficulties').selectOption(difficulty);
     const matches = data.filter(r => r.difficulty === difficulty);
     assert.equal(await count(), matches.length);
     const id = await roll();
     assert.ok(matches.some(r => r.id === id));
   });
-  await check('combined primary filters use intersection; multi-select within group uses union', async () => {
-    await page.locator('#dice-reset').click();
-    await page.locator('input[name=meal][value="Dinner"]').check();
-    await page.locator('input[name=meal][value="Lunch"]').check();
-    await page.locator('input[name=time][value="under30"]').check();
-    await page.locator('input[name=difficulty][value="Easy"]').check();
+  await check('combined imported multi-select keeps union within group and intersection between groups', async () => {
+    await visit('?meal=Dinner&meal=Lunch&time=under30&difficulty=Easy');
     const matches = data.filter(r => r.mealType.some(m => ['Dinner', 'Lunch'].includes(m)) && r.prepTimeMinutes + r.cookTimeMinutes < 30 && r.difficulty === 'Easy');
     assert.equal(await count(), matches.length);
+    assert.equal(await page.locator('#dice-meals').inputValue(), 'imported');
+    assert.match(await page.locator('#dice-imported-note').textContent(), /Flere valg/);
     const id = await roll();
     assert.ok(matches.some(r => r.id === id));
-    assert.equal(await page.locator('input[name=meal][value=""]').isChecked(), false);
+    await page.locator('#dice-meals').selectOption('Dinner');
+    const dinner = matches.filter(r => r.mealType.includes('Dinner'));
+    assert.equal(await count(), dinner.length);
+    assert.equal(await page.locator('#dice-times').inputValue(), 'under30');
+    assert.equal(await page.locator('#dice-difficulties').inputValue(), 'Easy');
   });
   await check('advanced cuisine, rating, ingredients and search work together', async () => {
     const recipe = data[0];
     await page.locator('#dice-reset').click();
-    await page.locator('summary').click();
+    await openFilters();
+    await page.locator('#dice-more-filters>summary').click();
     await page.locator(`input[name=cuisine][value="${recipe.cuisine}"]`).check();
     await page.locator('#dice-rating').selectOption('4');
     await page.locator('#dice-ingredients').fill(recipe.ingredients[0]);
@@ -160,6 +171,7 @@ fs.mkdirSync(output, { recursive: true });
     assert.equal(await page.locator('.recipe-card').count(), 0);
     assert.equal(await page.locator('#dice-search').inputValue(), 'zzzzunavailable');
     await page.locator('#dice-reset').click();
+    await openFilters();
     assert.equal(await count(), data.length);
     assert.equal(await page.locator('#dice-roll').isEnabled(), true);
   });
@@ -192,20 +204,23 @@ fs.mkdirSync(output, { recursive: true });
     await page.evaluate(query => sessionStorage.setItem('paa-menuen:filters:v1', JSON.stringify(query)), stored);
     await visit();
     assert.equal(await page.locator('input[name=cuisine][value=Italian]').isChecked(), true);
-    assert.equal(await page.locator('input[name=time][value=under30]').isChecked(), true);
+    assert.equal(await page.locator('#dice-times').inputValue(), 'under30');
     await page.locator('#dice-reset').click();
+    await openFilters();
     assert.equal(await page.evaluate(() => JSON.parse(sessionStorage.getItem('paa-menuen:filters:v1'))), stored);
     await visit('?meal=Dessert&rating=4.2');
-    assert.equal(await page.locator('input[name=meal][value=Dessert]').isChecked(), true);
+    assert.equal(await page.locator('#dice-meals').inputValue(), 'Dessert');
     assert.equal(await page.locator('#dice-rating').inputValue(), '4.2');
     assert.equal(await page.locator('input[name=cuisine][value=Italian]').isChecked(), false);
     await page.locator('#dice-reset').click();
+    await openFilters();
     assert.equal(await page.evaluate(() => JSON.parse(sessionStorage.getItem('paa-menuen:filters:v1'))), stored);
   });
   await check('changing filters during animation cancels stale result and permits next roll', async () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.locator('#dice-roll').click();
-    await page.locator('input[name=meal][value=Breakfast]').check();
+    await openFilters();
+    await page.locator('#dice-meals').selectOption('Breakfast');
     assert.equal(await page.locator('.recipe-card').count(), 0);
     await page.waitForTimeout(1100);
     assert.equal(await page.locator('.recipe-card').count(), 0);
@@ -215,6 +230,7 @@ fs.mkdirSync(output, { recursive: true });
   await check('filtering and rolling add no recipe API calls', async () => {
     const before = requests.length;
     await page.locator('#dice-reset').click();
+    await openFilters();
     await roll(); await roll();
     assert.equal(requests.length, before);
   });
@@ -223,6 +239,7 @@ fs.mkdirSync(output, { recursive: true });
       await page.setViewportSize({ width, height: 1000 });
       await page.emulateMedia({ reducedMotion: motion });
       await page.locator('#dice-reset').click();
+      await openFilters();
       await roll();
       await page.locator('.recipe-image').evaluate(img => img.decode());
       const layout = await page.evaluate(() => {
@@ -235,10 +252,10 @@ fs.mkdirSync(output, { recursive: true });
       if (width >= 700) assert.ok(layout.image.x >= layout.die.right);
       else assert.ok(layout.image.y > layout.die.y);
       assert.equal(await page.evaluate(() => document.activeElement.id), 'dice-roll');
-      if (!await page.locator('details').evaluate(e => e.open)) await page.locator('summary').click();
+      if (!await page.locator('#dice-more-filters').evaluate(e => e.open)) await page.locator('#dice-more-filters>summary').click();
       assert.equal(await page.locator('#dice-rating').isVisible(), true);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-      await page.locator('summary').click();
+      await page.locator('#dice-more-filters>summary').click();
     });
   }
   await check('real touch events activate the native die button', async () => {
@@ -275,6 +292,7 @@ fs.mkdirSync(output, { recursive: true });
     assert.match(await page.locator('#active-filters').textContent(), /UnknownLevel/);
     assert.equal(await page.locator('input[value=UnknownLevel],input[value=UnknownMeal],input[value=UnknownCuisine]').count(), 0);
     await page.locator('#dice-reset').click();
+    await openFilters();
     assert.equal(await count(), data.length);
   });
   await check('all six faces settle without accumulating turns; motion preference can change mid-roll', async () => {

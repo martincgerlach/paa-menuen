@@ -540,12 +540,12 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     await check(`dice status distinguishes no filters, active, disabled and all recipes ${width}px`, async () => {
       await page.evaluate(() => sessionStorage.removeItem('paa-menuen:filters:v1'));
       await visit('madterningen.html', '#dice-roll:not([disabled])');
-      assert.match(await page.locator('#match-count').textContent(), /Alle opskrifter/);
+      assert.match(await page.locator('#match-count').textContent(), /ingen filtre/);
       await visit('madterningen.html?rating=4', '#dice-roll:not([disabled])');
-      assert.doesNotMatch(await page.locator('#match-count').textContent(), /Alle opskrifter/);
+      assert.doesNotMatch(await page.locator('#match-count').textContent(), /ingen filtre/);
       assert.equal(await page.locator('#dice-rating').inputValue(), '4');
       await page.locator('#dice-reset').click();
-      assert.match(await page.locator('#match-count').textContent(), /Alle opskrifter/);
+      assert.match(await page.locator('#match-count').textContent(), /ingen filtre/);
       await visit('madterningen.html?q=zzzzunavailable', null);
       await page.waitForFunction(() => document.querySelector('#status').dataset.state === 'empty');
       assert.match(await page.locator('#status').textContent(), /Ingen opskrifter passer/);
