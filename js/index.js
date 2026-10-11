@@ -71,6 +71,8 @@ await loadWithRetry(async () => {
 
     if (featured.length > 1) {
       controls.hidden = false;
+      // Ved reduceret bevægelse er der intet automatisk billedskift at sætte på pause.
+      pause.hidden = reducedMotion;
       previous.addEventListener('click', () => changePhoto(-1));
       next.addEventListener('click', () => changePhoto(1));
       pause.addEventListener('click', () => {
