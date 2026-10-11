@@ -1,13 +1,17 @@
 import { getRecipes } from './api.js';
 import { filterRecipes, readFilters, pickRecipe } from './filters.js';
 import { activeFiltersQuery } from './storage.js';
-import { initCommon, loadWithRetry, renderRecipes, showChips, status } from './ui.js';
+import { el, initCommon, loadWithRetry, renderRecipes, showChips, status } from './ui.js';
 initCommon();
 let recipes = [],
   previousId = null;
 const form = document.getElementById('dice-form'),
   checkbox = document.getElementById('use-filters'),
-  button = document.getElementById('dice-roll');
+  button = document.getElementById('dice-roll'),
+  panel = document.getElementById('dice-panel'),
+  result = document.getElementById('dice-result'),
+  caption = document.getElementById('dice-caption'),
+  dice = document.querySelector('.dice-mark');
 let filters = readFilters(location.search || activeFiltersQuery());
 function candidates() {
   return checkbox.checked ? filterRecipes(recipes, filters) : recipes;
@@ -26,7 +30,11 @@ function preview() {
   button.disabled = !count;
 }
 checkbox.addEventListener('change', () => {
-  document.getElementById('dice-result').replaceChildren();
+  result.replaceChildren();
+  result.hidden = true;
+  panel.classList.remove('has-result');
+  caption.textContent = 'Lad terningen vælge';
+  button.textContent = 'Slå med Madterningen';
   previousId = null;
   preview();
 });
@@ -38,7 +46,15 @@ form.addEventListener('submit', event => {
     return;
   }
   previousId = recipe.id;
-  renderRecipes(document.getElementById('dice-result'), [recipe]);
+  renderRecipes(result, [recipe]);
+  const recipeLink = el('a', 'Se opskrift', 'button');
+  recipeLink.href = `singleproduct.html?id=${recipe.id}`;
+  result.querySelector('.card-body').append(recipeLink);
+  result.hidden = false;
+  panel.classList.add('has-result');
+  caption.textContent = 'Dit kast';
+  // Hvert klik skifter mellem to små vinkler. Opskriften vises med det samme.
+  dice.classList.toggle('is-rolled');
   button.textContent = 'Kast igen';
   status(`Dit forslag: ${recipe.name}`);
 });
