@@ -37,24 +37,123 @@ const labels = {
   over45: 'Over 45 min'
 };
 export const displayLabel = value => labels[value] || value;
-export const normalizeText = value => String(value).trim().toLocaleLowerCase('da').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-// Search aliases are our UI aid, not translations or new recipe data.
+// Opskrifterne bevares på engelsk fra DummyJSON. Vi oversætter kun brugerens søgeord.
+export const normalizeText = value => String(value)
+  .trim().toLocaleLowerCase('da')
+  .replace(/æ/g, 'ae').replace(/ø/g, 'oe').replace(/å/g, 'aa')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+// Flere engelske ingrediensord kan høre til det samme danske søgeord.
+// Listen er en hjælp til søgning, ikke en ændring af API'ets ingrediensdata.
 const aliases = {
-  tomat: 'tomato',
-  tomater: 'tomato',
-  kylling: 'chicken',
-  ris: 'rice',
-  ost: 'cheese',
-  kartoffel: 'potato',
-  kartofler: 'potato',
-  aeg: 'egg',
-  log: 'onion',
-  hvidlog: 'garlic',
-  maelk: 'milk',
-  oksekod: 'beef',
-  rejer: 'shrimp'
+  koed: ['beef', 'chicken', 'pork', 'lamb', 'turkey', 'duck', 'veal', 'meat', 'bacon', 'ham', 'sausage', 'sausages', 'salami', 'chorizo', 'pepperoni', 'prosciutto'],
+  oksekoed: ['beef', 'veal'],
+  hakketkoed: ['ground beef', 'ground lamb', 'ground pork', 'ground meat', 'minced meat'],
+  svinekoed: ['pork', 'bacon', 'ham', 'sausage', 'sausages', 'chorizo', 'prosciutto'],
+  kylling: ['chicken'],
+  kyllingebryst: ['chicken breast', 'chicken breasts'],
+  lam: ['lamb'],
+  kalkun: ['turkey'],
+  and: ['duck'],
+  skinke: ['ham', 'prosciutto'],
+  poelse: ['sausage', 'sausages'],
+  poelser: ['sausage', 'sausages'],
+  fisk: ['fish', 'salmon', 'tuna', 'cod', 'trout', 'anchovy', 'anchovies'],
+  laks: ['salmon'],
+  tunfisk: ['tuna'],
+  reje: ['shrimp', 'prawn', 'prawns'],
+  rejer: ['shrimp', 'prawn', 'prawns'],
+  aeg: ['egg', 'eggs'],
+  aeggeblomme: ['egg yolk', 'egg yolks'],
+  aeggehvide: ['egg white', 'egg whites'],
+  aubergine: ['eggplant', 'eggplants'],
+  aeggeplante: ['eggplant', 'eggplants'],
+  tomat: ['tomato', 'tomatoes'],
+  tomater: ['tomato', 'tomatoes'],
+  kartoffel: ['potato', 'potatoes'],
+  kartofler: ['potato', 'potatoes'],
+  loeg: ['onion', 'onions'],
+  roedloeg: ['red onion', 'red onions'],
+  foraarloeg: ['green onion', 'green onions', 'spring onion', 'scallions'],
+  hvidloeg: ['garlic'],
+  gulerod: ['carrot', 'carrots'],
+  guleroder: ['carrot', 'carrots'],
+  peberfrugt: ['bell pepper', 'bell peppers'],
+  champignon: ['mushroom', 'mushrooms'],
+  svampe: ['mushroom', 'mushrooms'],
+  spinat: ['spinach'],
+  blomkaal: ['cauliflower'],
+  kaal: ['cabbage', 'kale'],
+  aerter: ['pea', 'peas'],
+  agurk: ['cucumber', 'cucumbers'],
+  salat: ['lettuce', 'salad'],
+  majs: ['corn'],
+  boenner: ['bean', 'beans'],
+  kikerter: ['chickpea', 'chickpeas'],
+  citron: ['lemon'],
+  aeble: ['apple', 'apples'],
+  aebler: ['apple', 'apples'],
+  banan: ['banana', 'bananas'],
+  baer: ['berry', 'berries', 'blueberries', 'strawberries', 'raspberries'],
+  jordbaer: ['strawberry', 'strawberries'],
+  blaabaer: ['blueberry', 'blueberries'],
+  maelk: ['milk'],
+  kokosmaelk: ['coconut milk'],
+  yoghurt: ['yogurt', 'yoghurt'],
+  ost: ['cheese'],
+  floede: ['cream'],
+  smoer: ['butter'],
+  olie: ['oil'],
+  olivenolie: ['olive oil'],
+  mel: ['flour'],
+  hvedemel: ['all-purpose flour', 'wheat flour'],
+  sukker: ['sugar'],
+  honning: ['honey'],
+  salt: ['salt'],
+  peber: ['pepper'],
+  chili: ['chili', 'chilli', 'chilies', 'jalapeno'],
+  ingefaer: ['ginger'],
+  kanel: ['cinnamon'],
+  spidskommen: ['cumin'],
+  koriander: ['coriander', 'cilantro'],
+  persille: ['parsley'],
+  basilikum: ['basil'],
+  mynte: ['mint'],
+  oregano: ['oregano'],
+  timian: ['thyme'],
+  rosmarin: ['rosemary'],
+  paprika: ['paprika'],
+  karry: ['curry'],
+  ris: ['rice'],
+  nudler: ['noodles', 'ramen', 'vermicelli'],
+  pasta: ['pasta', 'spaghetti', 'fettuccine', 'linguine', 'penne', 'macaroni'],
+  broed: ['bread', 'baguette', 'flatbread'],
+  havregryn: ['oats', 'oatmeal'],
+  chokolade: ['chocolate', 'cocoa'],
+  kakao: ['cocoa'],
+  sojasauce: ['soy sauce'],
+  eddike: ['vinegar'],
+  balsamico: ['balsamic'],
+  bagepulver: ['baking powder'],
+  natron: ['baking soda'],
+  mandel: ['almond', 'almonds'],
+  mandler: ['almond', 'almonds'],
+  noedder: ['nuts', 'walnuts', 'almonds', 'peanuts', 'cashews'],
+  sesam: ['sesame']
 };
+
 export function searchTerms(value) {
+  const word = normalizeText(value);
+  return [...new Set([word, ...(aliases[word] || [])])].filter(Boolean);
+}
+
+// Et kort ord må ikke ramme et andet ord: "egg" er ikke "eggplant".
+function containsTerm(text, term) {
+  if (term.length > 3) return text.includes(term);
+  return text.split(/[^a-z0-9]+/).includes(term);
+}
+
+export function matchesSearch(value, query) {
   const text = normalizeText(value);
-  return [text, aliases[text]].filter(Boolean);
+  return searchTerms(query).some(term => containsTerm(text, normalizeText(term)));
 }
