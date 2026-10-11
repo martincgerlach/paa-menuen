@@ -65,34 +65,98 @@
         <h1>Madterningen</h1>
         <p>Slå med terningen og få et forslag til dit næste måltid.</p>
       </div>
-      <section id="dice-panel" class="dice-panel" aria-label="Kast med Madterningen">
-        <div class="dice-controls">
-          <div class="dice-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="4"/>
-              <g fill="currentColor" stroke="none">
-                <circle cx="7" cy="7" r="1.2"/>
-                <circle cx="17" cy="7" r="1.2"/>
-                <circle cx="12" cy="12" r="1.2"/>
-                <circle cx="7" cy="17" r="1.2"/>
-                <circle cx="17" cy="17" r="1.2"/>
-              </g>
-            </svg>
+      <form id="dice-filters" class="dice-filters" aria-label="Vælg opskriftsfiltre">
+        <fieldset id="dice-preferences" disabled>
+          <legend class="visually-hidden">Dine madpræferencer</legend>
+          <!-- Skjulte chip-former holder pladsen, indtil API-valgene er klar. -->
+          <div class="dice-primary-filters">
+            <fieldset>
+              <legend>Måltid</legend>
+              <div id="dice-meals" class="dice-choices">
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Alle</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Morgenmad</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Frokost</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Aftensmad</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Snack</span>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>Samlet tid</legend>
+              <div id="dice-times" class="dice-choices">
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Alle tider</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Under 30 min</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>30–45 min</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Over 45 min</span>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>Sværhedsgrad</legend>
+              <div id="dice-difficulties" class="dice-choices">
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Alle niveauer</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Let</span>
+                <span class="dice-choice dice-loading-choice" aria-hidden="true"><span class="dice-loading-check"></span>Middel</span>
+              </div>
+            </fieldset>
           </div>
-          <p id="dice-caption" class="dice-caption">Lad terningen vælge</p>
-          <form id="dice-form">
-            <button id="dice-roll" class="button" type="submit">Slå med Madterningen</button>
-            <label class="checkbox-label">
-              <input id="use-filters" type="checkbox" checked> Brug mine aktive opskriftsfiltre
-            </label>
-            <div id="active-filters" class="active-filters"></div>
-            <p><a href="productlist.html">Vælg filtre på opskriftssiden</a></p>
-          </form>
-          <p id="status" class="status" role="status" aria-live="polite"></p>
-          <button id="retry" class="button button-secondary" type="button" hidden>Prøv igen</button>
-        </div>
-        <div id="dice-result" class="dice-result" hidden></div>
-      </section>
+          <details class="dice-more-filters">
+            <summary>Flere filtre</summary>
+            <div class="dice-advanced-fields">
+              <fieldset>
+                <legend>Køkken</legend>
+                <div id="dice-cuisines" class="dice-choices"></div>
+              </fieldset>
+              <div>
+                <label for="dice-rating">Minimum bedømmelse</label>
+                <select id="dice-rating" name="rating">
+                  <option value="">Alle bedømmelser</option>
+                  <option value="4">4+ stjerner</option>
+                  <option value="4.5">4,5+ stjerner</option>
+                  <option value="4.8">4,8+ stjerner</option>
+                </select>
+              </div>
+              <div>
+                <label for="dice-ingredients">Ingredienser hjemme</label>
+                <input id="dice-ingredients" name="ingredients" type="text" placeholder="Fx kylling, ris">
+                <p class="dice-filter-help">Adskil med komma. Opskriften skal indeholde alle valgte ingredienser.</p>
+              </div>
+              <div>
+                <label for="dice-search">Søg i opskrifter</label>
+                <input id="dice-search" name="q" type="search" maxlength="120" placeholder="Navn eller ingrediens">
+              </div>
+            </div>
+          </details>
+          <div class="dice-filter-summary">
+            <p id="match-count">Henter opskrifter…</p>
+            <button id="dice-reset" class="button button-secondary" type="button">Nulstil filtre</button>
+          </div>
+          <div id="active-filters" class="active-filters"></div>
+        </fieldset>
+        <section id="dice-panel" class="dice-panel" aria-label="Kast med Madterningen">
+          <div class="dice-controls">
+            <p class="dice-caption">Hvad skal vi spise?</p>
+            <button id="dice-roll" class="dice-roll" type="submit" aria-label="Kast med Madterningen" aria-describedby="dice-instruction" disabled>
+              <span class="dice-scene" aria-hidden="true">
+                <span class="dice-cube">
+                  <span class="dice-face dice-face--1"><span class="pip pip--5"></span></span>
+                  <span class="dice-face dice-face--2"><span class="pip pip--1"></span><span class="pip pip--9"></span></span>
+                  <span class="dice-face dice-face--3"><span class="pip pip--1"></span><span class="pip pip--5"></span><span class="pip pip--9"></span></span>
+                  <span class="dice-face dice-face--4"><span class="pip pip--1"></span><span class="pip pip--3"></span><span class="pip pip--7"></span><span class="pip pip--9"></span></span>
+                  <span class="dice-face dice-face--5"><span class="pip pip--1"></span><span class="pip pip--3"></span><span class="pip pip--5"></span><span class="pip pip--7"></span><span class="pip pip--9"></span></span>
+                  <span class="dice-face dice-face--6"><span class="pip pip--1"></span><span class="pip pip--3"></span><span class="pip pip--4"></span><span class="pip pip--6"></span><span class="pip pip--7"></span><span class="pip pip--9"></span></span>
+                </span>
+              </span>
+            </button>
+            <p id="dice-instruction">Klik på terningen for at kaste</p>
+            <p id="status" class="status" role="status" aria-live="polite"></p>
+            <button id="retry" class="button button-secondary" type="button" hidden>Prøv igen</button>
+          </div>
+          <div id="dice-result" class="dice-result">
+            <div class="dice-result-placeholder">
+              <p>Vælg dine filtre, og klik på terningen for at finde din næste ret.</p>
+            </div>
+          </div>
+        </section>
+      </form>
       <p class="language-notice">Opskrifter, ingredienser og vejledninger vises på originalsproget fra DummyJSON.</p>
     </main>
     <footer class="site-footer">

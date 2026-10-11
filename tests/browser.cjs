@@ -214,24 +214,26 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     let prev = null;
     for (let i = 0; i < 4; i++) {
       await page.locator('#dice-roll').click();
+      await page.waitForFunction(() => !document.querySelector('#dice-roll').hasAttribute('aria-disabled'));
       const id = Number(await page.locator('.recipe-card').getAttribute('data-recipe-id'));
       assert.ok(ids.includes(id));
       if (ids.length > 1) assert.notEqual(id, prev);
       prev = id;
     }
-    await page.locator('#use-filters').uncheck();
-    assert.match(await page.locator('#status').textContent(), new RegExp(`${data.length} opskrifter`));
+    await page.locator('#dice-reset').click();
+    assert.match(await page.locator('#match-count').textContent(), new RegExp(`${data.length} opskrifter`));
     await page.locator('#dice-roll').click();
+    await page.waitForFunction(() => !document.querySelector('#dice-roll').hasAttribute('aria-disabled'));
     const unfilteredId = Number(await page.locator('.recipe-card').getAttribute('data-recipe-id'));
     assert.ok(data.some(r => r.id === unfilteredId));
     assert.equal(await page.locator('.recipe-card').count(), 1);
   });
   await check('Madterningen zero matches does not silently clear active filters', async () => {
     await visit('madterningen.html?q=zzzzunavailable', null);
-    await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Ingen opskrifter matcher'));
+    await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Ingen opskrifter passer'));
     assert.equal(await page.locator('#dice-roll').isDisabled(), true);
     assert.equal(await page.locator('.recipe-card').count(), 0);
-    assert.equal(await page.locator('#use-filters').isChecked(), true);
+    assert.equal(await page.locator('#dice-search').inputValue(), 'zzzzunavailable');
   });
   for (const query of ['', '?id=abc', '?id=-1', '?id=99999']) await check(`invalid detail ${query || 'missing ID'}`, async () => {
     await visit(`singleproduct.html${query}`, null);
@@ -538,14 +540,15 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     await check(`dice status distinguishes no filters, active, disabled and all recipes ${width}px`, async () => {
       await page.evaluate(() => sessionStorage.removeItem('paa-menuen:filters:v1'));
       await visit('madterningen.html', '#dice-roll:not([disabled])');
-      assert.match(await page.locator('#status').textContent(), /Alle opskrifter bruges/);
+      assert.match(await page.locator('#match-count').textContent(), /Alle opskrifter/);
       await visit('madterningen.html?rating=4', '#dice-roll:not([disabled])');
-      assert.match(await page.locator('#status').textContent(), /Aktive filtre bruges/);
-      await page.locator('#use-filters').uncheck();
-      assert.match(await page.locator('#status').textContent(), /Alle opskrifter bruges/);
+      assert.doesNotMatch(await page.locator('#match-count').textContent(), /Alle opskrifter/);
+      assert.equal(await page.locator('#dice-rating').inputValue(), '4');
+      await page.locator('#dice-reset').click();
+      assert.match(await page.locator('#match-count').textContent(), /Alle opskrifter/);
       await visit('madterningen.html?q=zzzzunavailable', null);
       await page.waitForFunction(() => document.querySelector('#status').dataset.state === 'empty');
-      assert.match(await page.locator('#status').textContent(), /Ingen opskrifter matcher/);
+      assert.match(await page.locator('#status').textContent(), /Ingen opskrifter passer/);
       assert.equal(await page.locator('#dice-roll').isDisabled(), true);
     });
   }
