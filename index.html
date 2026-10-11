@@ -60,19 +60,35 @@
     </header>
     <main id="main" class="page-content">
       <p id="storage-notice" class="storage-notice" role="status" hidden></p>
-      <section class="hero-section">
+      <section class="hero-section" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">Hvad skal vi spise i dag?</p>
-          <h1>Find dit næste<br>måltid</h1>
-          <p>Nem inspiration til hverdagens madvalg.</p>
+          <p class="eyebrow hero-eyebrow">Hvad skal vi spise i dag?</p>
+          <h1 id="hero-title">Find dit næste <span class="hero-title-highlight">måltid</span></h1>
+          <p class="hero-description">Fra hurtig aftensmad til nye favoritter. Find inspiration til det, du har lyst til.</p>
           <form class="hero-search" action="productlist.html" method="get">
-            <label class="visually-hidden" for="hero-q">Søg efter en opskrift</label>
-            <input id="hero-q" type="search" name="q" placeholder="Søg opskrifter">
-            <button class="button" type="submit">Find opskrifter</button>
+            <label class="visually-hidden" for="hero-q">Søg efter en opskrift eller ingrediens</label>
+            <div class="hero-search-field">
+              <svg class="hero-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="10.5" cy="10.5" r="6.5"/>
+                <path d="m16 16 5 5"/>
+              </svg>
+              <input id="hero-q" type="search" name="q" placeholder="Søg efter pasta, kylling eller ris">
+            </div>
+            <button class="button hero-search-button" type="submit">Find opskrifter <span aria-hidden="true">→</span></button>
           </form>
+          <nav class="hero-quick-links" aria-label="Hurtige opskriftsgenveje">
+            <span class="hero-quick-label">Prøv også</span>
+            <a href="productlist.html?time=under30">Under 30 min</a>
+            <a href="productlist.html?meal=Dinner">Aftensmad</a>
+            <a href="productlist.html?q=pasta">Pasta</a>
+          </nav>
         </div>
         <div class="hero-image-wrap">
           <img id="hero-image" src="assets/image-placeholder.svg" alt="" width="640" height="640" fetchpriority="high">
+          <div id="hero-image-overlay" class="hero-image-overlay" hidden>
+            <span class="hero-image-kicker">Fra opskriftsamlingen</span>
+            <a id="hero-recipe-link" href="productlist.html"></a>
+          </div>
         </div>
       </section>
       <nav class="meal-links" aria-label="Find opskrifter efter måltid">
