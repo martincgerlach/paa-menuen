@@ -1,8 +1,8 @@
-name: Homepage hero QA (development branch)
+name: Forsidens hero og billedskift – browsertest
 
 on:
   push:
-    branches: [hero-inviting-polish]
+    branches: [hero-inviting-polish, forside-billedskift]
   workflow_dispatch:
 
 permissions:
