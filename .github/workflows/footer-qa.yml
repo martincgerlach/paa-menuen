@@ -1,0 +1,48 @@
+name: Kontrollér ny footer på alle sider
+
+on:
+  push:
+    branches: [footer-redesign]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  footer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installér browser
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Start På Menuen lokalt
+        run: |
+          python3 -m http.server 8018 --bind 127.0.0.1 > /tmp/paa-menuen.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8018/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Test footer på syv sider og syv skærmstørrelser
+        run: node tests/footer-qa.cjs
+      - name: Test hele hjemmesidens responsive layout
+        env:
+          QA_URL: http://127.0.0.1:8018/
+          QA_OUTPUT: qa-layout
+        run: node tests/layout-viewport.cjs
+      - name: Gem screenshots og resultater
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: footer-og-layout-screenshots
+          path: |
+            qa-footer/
+            qa-layout/
+          retention-days: 14
+          if-no-files-found: warn
