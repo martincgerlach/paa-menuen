@@ -57,6 +57,28 @@ fs.mkdirSync(output,{recursive:true});
         await page.screenshot({path:path.join(output,'hero-'+width+'.png'),fullPage:true,animations:'disabled'});
       }
       if([390,1440].includes(width)){
+        await check(prefix+' carousel image and recipe stay matched',async()=>{
+          const first=await page.locator('#hero-recipe-link').getAttribute('href');
+          await page.locator('#hero-next').click();
+          await page.waitForFunction(before=>document.querySelector('#hero-recipe-link')?.getAttribute('href')!==before,first,{timeout:12000});
+          const href=await page.locator('#hero-recipe-link').getAttribute('href');
+          const id=Number(new URL(href,base).searchParams.get('id'));
+          const recipe=await page.evaluate(async id=>(await (await fetch('https://dummyjson.com/recipes/'+id)).json()),id);
+          assert.equal(await page.locator('#hero-image').getAttribute('src'),recipe.image);
+          assert.equal(await page.locator('#hero-image').getAttribute('alt'),recipe.name);
+          assert.equal(await page.locator('#hero-recipe-link').textContent(),recipe.name);
+          await page.locator('#hero-previous').click();
+          await page.waitForFunction(before=>document.querySelector('#hero-recipe-link')?.getAttribute('href')===before,first,{timeout:12000});
+        });
+        await check(prefix+' pause and resume control',async()=>{
+          const pause=page.locator('#hero-pause');
+          await pause.click();
+          assert.equal(await pause.getAttribute('aria-pressed'),'true');
+          assert.equal(await pause.textContent(),'Afspil');
+          await pause.click();
+          assert.equal(await pause.getAttribute('aria-pressed'),'false');
+          assert.equal(await pause.textContent(),'Pause');
+        });
         await check(prefix+' search behavior',async()=>{
           await page.locator('#hero-q').fill('pasta');
           await page.locator('.hero-search-button').click();
@@ -69,6 +91,26 @@ fs.mkdirSync(output,{recursive:true});
           await page.getByRole('link',{name:'Under 30 min'}).first().click();
           await page.waitForURL('**/productlist.html?time=under30');
           await page.locator('#result-count').waitFor({timeout:20000});
+        });
+      }
+      if(width===390){
+        await check(prefix+' reduced motion disables autoplay but keeps manual arrows',async()=>{
+          await page.emulateMedia({reducedMotion:'reduce'});
+          await page.goto(base+'index.html',{waitUntil:'domcontentloaded'});
+          await page.locator('#hero-next:visible').waitFor({timeout:20000});
+          assert.equal(await page.locator('#hero-pause').isVisible(),false);
+          const before=await page.locator('#hero-recipe-link').getAttribute('href');
+          await page.locator('#hero-next').click();
+          await page.waitForFunction(href=>document.querySelector('#hero-recipe-link')?.getAttribute('href')!==href,before,{timeout:12000});
+        });
+      }
+      if(width===1440){
+        await check(prefix+' automatic slide changes after seven seconds',async()=>{
+          await page.goto(base+'index.html',{waitUntil:'domcontentloaded'});
+          await page.locator('#hero-image-controls:visible').waitFor({timeout:20000});
+          const first=await page.locator('#hero-recipe-link').getAttribute('href');
+          await page.mouse.move(1,1);
+          await page.waitForFunction(before=>document.querySelector('#hero-recipe-link')?.getAttribute('href')!==before,first,{timeout:11000});
         });
       }
       if(errors.length)checks.push({label:prefix+' JS errors',status:'FAIL',error:errors.join(' | ')});

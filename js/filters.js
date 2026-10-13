@@ -1,4 +1,4 @@
-import { normalizeText, searchTerms } from './labels.js';
+import { matchesSearch } from './labels.js';
 export const emptyFilters = () => ({
   q: '',
   cuisine: [],
@@ -14,9 +14,9 @@ export function totalTime(r) {
 const canonicalMeal = value => value === 'Snacks' ? 'Snack' : value;
 export function filterRecipes(recipes, f) {
   return recipes.filter(r => {
-    const text = normalizeText([r.name, ...r.ingredients].join(' '));
+    const text = [r.name, ...r.ingredients, ...r.tags, r.cuisine, ...r.mealType].join(' ');
     const time = totalTime(r);
-    return (!f.q || searchTerms(f.q).some(term => text.includes(term)))
+    return (!f.q || matchesSearch(text, f.q))
       && (!f.cuisine.length || f.cuisine.includes(r.cuisine))
       && (!f.meal.length || r.mealType.some(meal => f.meal.includes(canonicalMeal(meal))))
       && (!f.difficulty.length || f.difficulty.includes(r.difficulty))
@@ -26,7 +26,7 @@ export function filterRecipes(recipes, f) {
           : band === '30to45' ? time >= 30 && time <= 45
             : time > 45))
       && f.ingredients.every(ingredient => r.ingredients.some(item =>
-        searchTerms(ingredient).some(term => normalizeText(item).includes(term))));
+        matchesSearch(item, ingredient)));
   });
 }
 export function sortRecipes(recipes, mode) {
