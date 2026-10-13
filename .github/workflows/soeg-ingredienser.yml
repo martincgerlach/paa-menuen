@@ -1,0 +1,47 @@
+name: Test søgning i alle ingredienser
+
+on:
+  push:
+    branches: [sog-paa-ingredienser]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  soegning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test søgelogik og danske ord
+        run: node --experimental-default-type=module --test tests/logic.test.mjs
+      - name: Gennemgå alle live API-opskrifter og ingredienser
+        run: node --experimental-default-type=module tests/ingredient-search-live.mjs
+      - name: Installér Playwright og Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Start hjemmesiden lokalt
+        run: |
+          python3 -m http.server 8018 --bind 127.0.0.1 > /tmp/paamenuen.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8018/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Test søgning i Chrome på mobil og desktop
+        env:
+          QA_URL: http://127.0.0.1:8018/
+        run: node tests/search-qa.cjs
+      - name: Upload ingrediensoversigt og testbeviser
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ingrediens-soegning-rapport
+          path: qa-search/
+          if-no-files-found: warn
+          retention-days: 14
