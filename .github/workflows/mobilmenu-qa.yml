@@ -1,0 +1,65 @@
+name: Test mobilmenu
+
+on:
+  pull_request:
+    paths:
+      - '*.html'
+      - 'css/**'
+      - 'js/**'
+      - 'tests/mobile-menu-qa.cjs'
+      - 'tests/navigation-icon-qa.cjs'
+      - 'tests/layout-viewport.cjs'
+      - 'tests/logic.test.mjs'
+      - '.github/workflows/mobilmenu-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-mobilmenu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installér testværktøj og Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.62.1
+          npx playwright install --with-deps chromium
+      - name: Start lokal testserver
+        run: |
+          python3 -m http.server 8018 --bind 127.0.0.1 > /tmp/paamenuen.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8018/index.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/paamenuen.log
+          exit 1
+      - name: Kontrollér JavaScript-logik
+        run: node --experimental-default-type=module --test tests/logic.test.mjs
+      - name: Kontrollér mobilmenu på alle syv sider
+        env:
+          QA_URL: http://127.0.0.1:8018/
+          QA_OUTPUT: output/playwright/menu
+        run: node tests/mobile-menu-qa.cjs
+      - name: Kontrollér eksisterende navigation
+        env:
+          QA_URL: http://127.0.0.1:8018/
+          QA_OUTPUT: output/playwright/navigation
+        run: node tests/navigation-icon-qa.cjs
+      - name: Kontrollér sidernes layout
+        env:
+          QA_URL: http://127.0.0.1:8018/
+          QA_OUTPUT: output/playwright/layout
+        run: node tests/layout-viewport.cjs
+      - name: Gem screenshots og testresultater
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobilmenu-test
+          path: output/playwright/
+          if-no-files-found: warn
+          retention-days: 14

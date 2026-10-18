@@ -130,6 +130,7 @@ export function initCommon() {
   document.querySelectorAll('nav a').forEach(a => {
     if (a.getAttribute('href') === path) a.setAttribute('aria-current', 'page');
   });
+  initMobileMenu(path);
   showStorageWarning();
   window.addEventListener('storage', () => document.dispatchEvent(new CustomEvent('favorites-changed')));
   document.addEventListener('favorites-changed', () => {
@@ -140,5 +141,64 @@ export function initCommon() {
       button.setAttribute('aria-pressed', String(saved));
       button.setAttribute('aria-label', button.getAttribute('aria-label').replace(/^(Gem favorit|Fjern favorit)/, saved ? 'Fjern favorit' : 'Gem favorit'));
     });
+  });
+}
+
+function initMobileMenu(path) {
+  const header = document.querySelector('.site-header');
+  const button = document.getElementById('mobile-menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  if (!header || !button || !menu) return;
+
+  // En opskriftsdetalje hører til under Opskrifter, men er ikke selve listesiden.
+  if (path === 'singleproduct.html') {
+    menu.querySelector('a[href="productlist.html"]').setAttribute('aria-current', 'location');
+  }
+
+  function setMenuOpen(open) {
+    menu.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
+    button.setAttribute('aria-label', open ? 'Luk menu' : 'Åbn menu');
+  }
+
+  header.classList.add('has-mobile-menu');
+  button.hidden = false;
+  button.addEventListener('click', () => setMenuOpen(menu.hidden));
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !menu.hidden) {
+      event.preventDefault();
+      setMenuOpen(false);
+      button.focus();
+    }
+  });
+
+  document.addEventListener('click', event => {
+    if (!menu.hidden && !menu.contains(event.target) && !button.contains(event.target)) {
+      const focusInside = menu.contains(document.activeElement);
+      setMenuOpen(false);
+      if (focusInside) button.focus();
+    }
+  });
+
+  header.addEventListener('focusout', event => {
+    if (!header.contains(event.relatedTarget)) setMenuOpen(false);
+  });
+
+  menu.addEventListener('click', event => {
+    if (event.target.closest('a')) {
+      setMenuOpen(false);
+      button.focus();
+    }
+  });
+
+  // Luk ved skift væk fra mobillayout, så en skjult menu ikke beholder fokus.
+  const mobile = window.matchMedia('(max-width: 699px)');
+  mobile.addEventListener('change', () => {
+    if (!mobile.matches) {
+      const focusInside = menu.contains(document.activeElement) || document.activeElement === button;
+      setMenuOpen(false);
+      if (focusInside) header.querySelector('.logo').focus();
+    }
   });
 }
