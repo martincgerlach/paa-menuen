@@ -116,7 +116,7 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
   await check('homepage API hero/cards and category link', async () => {
     await visit('index.html');
     assert.equal(await page.locator('#home-recipes .recipe-card').count(), 3);
-    assert.equal(await page.getByRole('link', {
+    assert.equal(await page.locator('.dice-banner').getByRole('link', {
       name: 'Prøv Madterningen',
       exact: true
     }).getAttribute('href'), 'madterningen.html');
@@ -396,7 +396,7 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('#filter-open').evaluate(el => el === document.activeElement), true);
   });
-  await check('short empty favorites fill viewport without extra scrolling', async () => {
+  await check('empty favorites use natural content height with the shared footer', async () => {
     await page.setViewportSize({
       width: 390,
       height: 844
@@ -404,7 +404,12 @@ const base = process.env.QA_URL || 'http://127.0.0.1:8018/';
     await visit('favoritter.html', null);
     await page.waitForFunction(() => document.querySelector('.empty-state')?.textContent.includes('ingen favoritter'));
     await page.evaluate(() => document.fonts.ready);
-    assert.ok(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1));
+    assert.ok(await page.evaluate(() => {
+      const main = document.querySelector('main').getBoundingClientRect();
+      const footer = document.querySelector('.site-footer').getBoundingClientRect();
+      return main.height < innerHeight && Math.abs(footer.top - main.bottom) < 1
+        && document.documentElement.scrollWidth <= innerWidth;
+    }));
   });
   await check('all live recipe cards keep full titles and aligned favorite buttons', async () => {
     await visit('productlist.html');
