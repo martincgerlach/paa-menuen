@@ -56,6 +56,18 @@ Ruling: Describe the fictional concept alongside truthful school-project/API pro
 
 ## Tests
 
+Mobilmenuen er dokumenteret som [UX-iteration efter Sabrinas brugertest](docs/ux-iteration-mobilmenu.md).
+Den vises kun under 700 px. Tablet- og desktop-header samt den eksisterende bundnavigation er bevaret.
+
+Den særskilte menutest køres med den samme eksterne Playwright-installation:
+
+```sh
+PLAYWRIGHT_PATH=/path/to/playwright QA_URL=http://127.0.0.1:8018/ QA_OUTPUT=/path/to/evidence node tests/mobile-menu-qa.cjs
+```
+
+`CHROME_PATH` kan bruges til at vælge en installeret Chrome. Uden den bruger testen Playwrights Chromium.
+PR-workflowet `mobilmenu-qa.yml` kører menu-, navigations-, layout- og logiktests. Det udgiver ikke hjemmesiden.
+
 Node 22+ (no packages needed for pure logic):
 
 ```sh
