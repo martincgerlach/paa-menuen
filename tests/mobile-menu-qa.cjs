@@ -265,4 +265,3 @@ fs.mkdirSync(output, { recursive: true });
   console.error(error);
   process.exitCode = 1;
 });
-

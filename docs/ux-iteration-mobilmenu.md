@@ -62,4 +62,3 @@ Screenshots af alle syv sider ved 320 og 390 px gemmes som testbilag. PR-workflo
 ## Status og næste skridt
 
 Løsningen er klar til gennemgang i pull requesten. Den er ikke merget eller deployet som en del af denne iteration. Næste brugeropgave er at bede en deltager finde en anden side fra mobilforsiden uden at fortælle, hvor menuen er. Notér, om vedkommende finder knappen og når den ønskede side. Resultatet er endnu ikke målt.
-
